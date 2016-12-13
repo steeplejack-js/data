@@ -19,7 +19,7 @@
  * @param {*} b
  * @returns {number}
  */
-export function sortAsc (a: any, b: any) : number {
+export function sortAsc (a: any, b: any): number {
   if (a < b) {
     return -1;
   } else if (a > b) {
@@ -28,7 +28,6 @@ export function sortAsc (a: any, b: any) : number {
     return 0;
   }
 }
-
 
 /**
  * Sort DESC
@@ -39,7 +38,7 @@ export function sortAsc (a: any, b: any) : number {
  * @param {*} b
  * @returns {number}
  */
-export function sortDesc (a: any, b: any) : number {
+export function sortDesc (a: any, b: any): number {
   if (a < b) {
     return 1;
   } else if (a > b) {

@@ -10,11 +10,10 @@
 import * as _ from "lodash";
 
 /* Files */
-import {Model} from "./model";
 import {IDefinitionValidation} from "../interfaces/definitionValidation";
+import {Model} from "./model";
 
 export class Validation {
-
 
   /**
    * Create Closure
@@ -31,10 +30,10 @@ export class Validation {
    * @param {boolean} isRequired
    * @returns {function(Model, any): (boolean|*)}
    */
-  static createClosure (rule: Function, params: any[], defaultValue: any, isRequired: boolean) : Function {
+  public static createClosure (rule: Function, params: any[], defaultValue: any, isRequired: boolean): Function {
 
     /* Create closure with params */
-    return function (value: any, model: Model) {
+    return (value: any, model: Model) => {
 
       if (value === defaultValue && isRequired === false) {
         /* Value is not set and not required - validate */
@@ -44,7 +43,7 @@ export class Validation {
         /* Build the array to send to the rule */
         let input: any[] = [
           value,
-          model
+          model,
         ];
 
         /* Are there any parameters? */
@@ -61,7 +60,6 @@ export class Validation {
 
   }
 
-
   /**
    * Generate Function
    *
@@ -71,7 +69,7 @@ export class Validation {
    * @param {IDefinitionValidation} validate
    * @param {*} defaultValue
    */
-  static generateFunction (validate: IDefinitionValidation, defaultValue: any = void 0) : any {
+  public static generateFunction (validate: IDefinitionValidation, defaultValue: any = void 0): any {
 
     if (_.isObject(validate) === false) {
       return null;
@@ -100,7 +98,7 @@ export class Validation {
       } else if (_.isFunction((<any> Model.validation)[ruleName])) {
 
         /* Valid rule in the validation utils package */
-        ruleFn = function (value: string, model: Model, ...args: any[]) {
+        ruleFn = (value: string, model: Model, ...args: any[]) => {
 
           /* Add the value as first element */
           args.unshift(value);
@@ -125,7 +123,6 @@ export class Validation {
 
   }
 
-
   /**
    * Match
    *
@@ -138,7 +135,7 @@ export class Validation {
    * @param {string} key
    * @returns {boolean}
    */
-  static match (value: any, model: Model, key: string) : boolean {
+  public static match (value: any, model: Model, key: string): boolean {
 
     let matchValue: any = model.get(key);
 
@@ -148,7 +145,7 @@ export class Validation {
       err.key = key;
       err.value = value;
       err.params = [
-        matchValue
+        matchValue,
       ];
 
       throw err;
@@ -158,6 +155,5 @@ export class Validation {
     return true;
 
   }
-
 
 }

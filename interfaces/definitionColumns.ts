@@ -8,7 +8,6 @@
 
 /* Files */
 
-
 export interface IDefinitionColumns {
   key: string;
   column: string;

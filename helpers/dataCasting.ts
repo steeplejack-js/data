@@ -28,5 +28,5 @@ export const dataCasting = {
   float: "setFloat",
   integer: "setInt",
   object: "setObject",
-  string: "setString"
+  string: "setString",
 };

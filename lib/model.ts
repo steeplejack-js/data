@@ -10,19 +10,82 @@
 /* Node modules */
 
 /* Third-party modules */
-import * as _ from "lodash";
 import {Base, ValidationException} from "@steeplejack/core";
+import * as _ from "lodash";
 
 /* Files */
-import {Definition} from "./definition";
 import {dataCasting} from "../helpers/dataCasting";
 import {getFnName} from "../helpers/getFnName";
 import {scalarValues} from "../helpers/scalarValues";
 import {IDefinitionColumns} from "../interfaces/definitionColumns";
 import {IModelDefinition} from "../interfaces/modelDefinition";
+import {Definition} from "./definition";
 
 export abstract class Model extends Base {
 
+  /**
+   * Merge
+   *
+   * Wraps the lodash defaultsDeep method. This
+   * exists purely as a helper method so that
+   * any user can merge their schema objects
+   * without having to have lodash as a dependency.
+   *
+   * @param {*} object
+   * @param {*} sources
+   * @returns {*}
+   */
+  public static merge (object: any, ...sources: any[]): any {
+    return _.defaultsDeep(object, ...sources);
+  }
+
+  /**
+   * To Model
+   *
+   * Converts an object literal to an instance
+   * of this model. This will be expecting the
+   * data in the same format that is returned
+   * from the toDb() method
+   *
+   * @param {any} data
+   * @returns {Model}
+   */
+  public static toModel (data: any = {}): Model {
+
+    /* Create a new instance of this model with default data */
+    let model = Object.create(this.prototype);
+    this.apply(model, []);
+
+    let definition: IDefinitionColumns[] = model.getColumnKeys();
+
+    /* Set the column data to the model */
+    _.each(definition, (item) => {
+
+      const key = item.key;
+      let value = data[item.column];
+      const modelDefinition = model.getDefinition(key);
+      const type = modelDefinition.type;
+
+      if (value !== modelDefinition.value && value !== void 0) {
+
+        if (_.isFunction(type.toModels)) {
+          /* It's a collection */
+          value = type.toModels(value).getData();
+        } else if (_.isFunction(type.toModel)) {
+          /* It's a model */
+          value = type.toModel(value).getData();
+        }
+
+      }
+
+      /* Set the data to the model */
+      model.set(key, value);
+
+    });
+
+    return model;
+
+  }
 
   /**
    * Data
@@ -34,8 +97,7 @@ export abstract class Model extends Base {
    * @type {{}}
    * @private
    */
-  protected _data: any = {};
-
+  protected Data: any = {};
 
   /**
    * Definition
@@ -46,8 +108,7 @@ export abstract class Model extends Base {
    * @type {{}}
    * @private
    */
-  protected _definition: any = {};
-
+  protected Definition: any = {};
 
   /**
    * Primary Key
@@ -58,22 +119,7 @@ export abstract class Model extends Base {
    * @type {null}
    * @private
    */
-  protected _primaryKey: string = null;
-
-
-  /**
-   * Schema
-   *
-   * This must return a schema object which
-   * defines how our model looks and behaves. If
-   * you wish to extend a model to create another
-   * model, then merge your parent schema with
-   * this schema using the _mergeSchemas method.
-   *
-   * @private
-   */
-  protected abstract _schema (child?: any) : any;
-
+  protected PrimaryKey: string = null;
 
   /**
    * Constructor
@@ -93,193 +139,6 @@ export abstract class Model extends Base {
 
   }
 
-
-  /**
-   * Configure Definition
-   *
-   * Takes the schema and converts it to a
-   * definition object
-   *
-   * @private
-   */
-  protected _configureDefinition () : void {
-
-    /* Written like this (not with _.reduce) as the setter needs to access the definition */
-    _.each(this.getSchema(), (schemaItem: IModelDefinition, key: string) => {
-
-      let definition = Definition.toDefinition(key, schemaItem);
-
-      if (definition.hasPrimaryKey()) {
-        this._setPrimaryKey(key);
-      }
-
-      /* Set the definition to the class */
-      this._definition[key] = definition;
-
-      /* Create the setters and getters */
-      Object.defineProperty(this, key, {
-        configurable: false,
-        enumerable: true,
-        set: (value: any) => {
-          return this.set(key, value);
-        },
-        get: () => {
-          return this.get(key);
-        }
-      });
-
-      /* Set the default value */
-      (<any> this)[key] = void 0;
-
-    }, {});
-
-  }
-
-
-  /**
-   * Merge Schemas
-   *
-   * Helper to merge together two schemas
-   *
-   * @param {object} parent
-   * @param {object} child
-   * @returns {Object}
-   * @private
-   */
-  protected _mergeSchemas (parent: any, child: any) : any {
-
-    let schema: Object = _.extend(parent, child);
-
-    return schema;
-
-  }
-
-
-  /**
-   * Set Custom Function
-   *
-   * This is setting a function which is already set
-   * to this instance of the class
-   *
-   * @param {string} customFunc
-   * @param {*} value
-   * @param {*} defaultValue
-   * @returns {*}
-   * @private
-   */
-  protected _setCustomFunction (customFunc: string, value: any, defaultValue: any) : any {
-    value = (<any> this)[customFunc](value, defaultValue);
-
-    if (_.isUndefined(value)) {
-      value = defaultValue;
-    }
-
-    return value;
-  }
-
-
-  /**
-   * Set Primary Key
-   *
-   * Sets the primary key
-   *
-   * @param {string} key
-   * @private
-   */
-  protected _setPrimaryKey (key: string) {
-
-    if (this.getPrimaryKey() === null) {
-      this._primaryKey = key;
-    } else {
-      throw new Error("CANNOT_SET_MULTIPLE_PRIMARY_KEYS");
-    }
-  }
-
-
-  /**
-   * Set Standard Function
-   *
-   * This is setting a standard function which actually
-   * a function
-   *
-   * @param {function} type
-   * @param {*} value
-   * @param {*} defaultValue
-   * @returns {*}
-   * @private
-   */
-  protected _setStandardFunction (type: any, value: any, defaultValue: any) : any {
-
-    if (value instanceof type === false) {
-
-      /* No - populate the instance if something set */
-      let createNew = false;
-
-      if (_.isArray(value)) {
-        createNew = true;
-      } else {
-        value = Base.datatypes.setObject(value, defaultValue);
-        createNew = value !== defaultValue;
-      }
-
-      if (createNew) {
-        value = new type(value);
-      }
-
-    }
-
-    return value;
-
-  }
-
-
-  /**
-   * Set String Function
-   *
-   * We're setting a function that's a description
-   * of how we want to set it
-   *
-   * @param {string} type
-   * @param {*} value
-   * @param {*} defaultValue
-   * @param {*} definition
-   * @returns {*}
-   * @private
-   */
-  protected _setStringFunction (type: string, value: any, defaultValue: any, definition: any) : any {
-
-    switch (type) {
-
-      case "enum":
-        value = Base.datatypes.setEnum(value, definition.enum, defaultValue);
-        break;
-
-      case "mixed":
-        if (_.isUndefined(value)) {
-          value = defaultValue;
-        }
-        break;
-
-      default:
-        if (_.has(dataCasting, type)) {
-
-          let fnName: string = (<any> dataCasting)[type];
-          let fn: Function = (<any> Base.datatypes)[fnName];
-
-          value = fn(value, defaultValue);
-
-        } else {
-          /* Unknown datatype */
-          throw new TypeError(`Definition.type '${type}' is not valid`);
-        }
-        break;
-    }
-
-    return value;
-
-  }
-
-
   /**
    * Get
    *
@@ -288,13 +147,13 @@ export abstract class Model extends Base {
    * @param {string} key
    * @returns {any}
    */
-  public get (key: string) : any {
+  public get (key: string): any {
 
     /* Look for a protected method first */
     let customFunc = getFnName("_get", key);
 
     /* Get the current value */
-    let currentValue: any = (_.has(this._data, key)) ? this._data[key] : void 0;
+    let currentValue: any = (_.has(this.Data, key)) ? this.Data[key] : void 0;
 
     if (_.isFunction((<any> this)[customFunc])) {
 
@@ -310,7 +169,6 @@ export abstract class Model extends Base {
 
   }
 
-
   /**
    * Get Column Keys
    *
@@ -319,13 +177,13 @@ export abstract class Model extends Base {
    *
    * @returns {IDefinitionColumns[]}
    */
-  public getColumnKeys () : IDefinitionColumns[] {
+  public getColumnKeys (): IDefinitionColumns[] {
 
-    return _.reduce(this._definition, (result: any, definition: Definition, key: string) => {
+    return _.reduce(this.Definition, (result: any, definition: Definition, key: string) => {
 
       result.push({
-        key: key,
-        column: definition.column
+        column: definition.column,
+        key,
       });
 
       return result;
@@ -333,7 +191,6 @@ export abstract class Model extends Base {
     }, []);
 
   }
-
 
   /**
    * Get Data
@@ -351,9 +208,9 @@ export abstract class Model extends Base {
    * @param {boolean} parse
    * @returns {any}
    */
-  public getData (parse: boolean = true) : any {
+  public getData (parse: boolean = true): any {
 
-    return _.reduce(this._data, (result: any, data: any, key: string) => {
+    return _.reduce(this.Data, (result: any, data: any, key: string) => {
 
       if (_.isObject(data) && _.isFunction(data.getData)) {
         data = data.getData();
@@ -369,7 +226,6 @@ export abstract class Model extends Base {
 
   }
 
-
   /**
    * Get Definition
    *
@@ -380,10 +236,9 @@ export abstract class Model extends Base {
    * @param {string} key
    * @returns {Definition|null}
    */
-  public getDefinition (key: string) : Definition {
-    return this._definition[key] || null;
+  public getDefinition (key: string): Definition {
+    return this.Definition[key] || null;
   }
-
 
   /**
    * Get Primary Key
@@ -392,10 +247,9 @@ export abstract class Model extends Base {
    *
    * @return {string}
    */
-  getPrimaryKey () {
-    return this._primaryKey;
+  public getPrimaryKey () {
+    return this.PrimaryKey;
   }
-
 
   /**
    * Get Primary Key Value
@@ -404,10 +258,9 @@ export abstract class Model extends Base {
    *
    * @returns {*}
    */
-  getPrimaryKeyValue () {
+  public getPrimaryKeyValue () {
     return this.get(this.getPrimaryKey());
   }
-
 
   /**
    * Get Schema
@@ -417,10 +270,9 @@ export abstract class Model extends Base {
    *
    * @returns {*}
    */
-  public getSchema () : any {
+  public getSchema (): any {
     return this._schema() || {};
   }
-
 
   /**
    * Set
@@ -437,7 +289,7 @@ export abstract class Model extends Base {
    * @param {any} value
    * @returns {Model}
    */
-  public set (key: string, value: any = void 0) : Model {
+  public set (key: string, value: any = void 0): Model {
 
     let definition = this.getDefinition(key);
 
@@ -472,12 +324,11 @@ export abstract class Model extends Base {
 
     }
 
-    this._data[key] = value;
+    this.Data[key] = value;
 
     return this;
 
   }
-
 
   /**
    * To Db
@@ -488,9 +339,9 @@ export abstract class Model extends Base {
    *
    * @returns {any}
    */
-  public toDb () : any {
+  public toDb (): any {
 
-    return _.reduce(this._definition, (result: any, definition: Definition, key: string) => {
+    return _.reduce(this.Definition, (result: any, definition: Definition, key: string) => {
 
       /* Get the column name */
       let column: string = definition.column;
@@ -514,7 +365,6 @@ export abstract class Model extends Base {
     }, {});
   }
 
-
   /**
    * Validate
    *
@@ -531,7 +381,7 @@ export abstract class Model extends Base {
     let validation = new ValidationException("Model validation error");
 
     /* Run through each of the definitions for the validation rules */
-    _.each(this._definition, (definition: Definition, key: string) => {
+    _.each(this.Definition, (definition: Definition, key: string) => {
 
       /* Get the current value */
       let value: any = this.get(key);
@@ -545,11 +395,11 @@ export abstract class Model extends Base {
 
           _.each(err.getErrors(), (list: any[], errKey: string) => {
 
-            _.each(list, error => {
+            _.each(list, (error) => {
 
               let name = [
                 key,
-                errKey
+                errKey,
               ].join("_");
 
               validation.addError(name, error.value, error.message, error.additional);
@@ -563,7 +413,7 @@ export abstract class Model extends Base {
       }
 
       /* Cycle through the validation rules */
-      _.each(definition.validation, (rule : Function) => {
+      _.each(definition.validation, (rule: Function) => {
 
         try {
           /* A validation function can throw error or return false */
@@ -590,7 +440,6 @@ export abstract class Model extends Base {
 
   }
 
-
   /**
    * Where
    *
@@ -603,7 +452,7 @@ export abstract class Model extends Base {
    * @param {object} properties
    * @returns {boolean}
    */
-  public where (properties: Object) : boolean {
+  public where (properties: Object): boolean {
 
     /* Throw error if non-object */
     if (_.isPlainObject(properties) === false) {
@@ -647,71 +496,197 @@ export abstract class Model extends Base {
 
   }
 
+  /**
+   * Schema
+   *
+   * This must return a schema object which
+   * defines how our model looks and behaves. If
+   * you wish to extend a model to create another
+   * model, then merge your parent schema with
+   * this schema using the _mergeSchemas method.
+   *
+   * @private
+   */
+  protected abstract _schema (child?: any): any;
 
   /**
-   * Merge
+   * Configure Definition
    *
-   * Wraps the lodash defaultsDeep method. This
-   * exists purely as a helper method so that
-   * any user can merge their schema objects
-   * without having to have lodash as a dependency.
+   * Takes the schema and converts it to a
+   * definition object
    *
-   * @param {*} object
-   * @param {*} sources
-   * @returns {*}
+   * @private
    */
-  static merge (object: any, ...sources: any[]) : any {
-    return _.defaultsDeep(object, ...sources);
-  }
+  protected _configureDefinition (): void {
 
+    /* Written like this (not with _.reduce) as the setter needs to access the definition */
+    _.each(this.getSchema(), (schemaItem: IModelDefinition, key: string) => {
 
-  /**
-   * To Model
-   *
-   * Converts an object literal to an instance
-   * of this model. This will be expecting the
-   * data in the same format that is returned
-   * from the toDb() method
-   *
-   * @param {any} data
-   * @returns {Model}
-   */
-  static toModel (data: any = {}) : Model {
+      let definition = Definition.toDefinition(key, schemaItem);
 
-    /* Create a new instance of this model with default data */
-    let model = Object.create(this.prototype);
-    this.apply(model, []);
-
-    let definition: IDefinitionColumns[] = model.getColumnKeys();
-
-    /* Set the column data to the model */
-    _.each(definition, item => {
-
-      const key = item.key;
-      let value = data[item.column];
-      const modelDefinition = model.getDefinition(key);
-      const type = modelDefinition.type;
-
-      if (value !== modelDefinition.value && value !== void 0) {
-
-        if (_.isFunction(type.toModels)) {
-          /* It's a collection */
-          value = type.toModels(value).getData();
-        } else if (_.isFunction(type.toModel)) {
-          /* It's a model */
-          value = type.toModel(value).getData();
-        }
-
+      if (definition.hasPrimaryKey()) {
+        this._setPrimaryKey(key);
       }
 
-      /* Set the data to the model */
-      model.set(key, value);
+      /* Set the definition to the class */
+      this.Definition[key] = definition;
 
-    });
+      /* Create the setters and getters */
+      Object.defineProperty(this, key, {
+        configurable: false,
+        enumerable: true,
+        get: () => {
+          return this.get(key);
+        },
+        set: (value: any) => {
+          return this.set(key, value);
+        },
+      });
 
-    return model;
+      /* Set the default value */
+      (<any> this)[key] = void 0;
+
+    }, {});
 
   }
 
+  /**
+   * Merge Schemas
+   *
+   * Helper to merge together two schemas
+   *
+   * @param {object} parent
+   * @param {object} child
+   * @returns {Object}
+   * @private
+   */
+  protected _mergeSchemas (parent: any, child: any): any {
+
+    let schema: Object = _.extend(parent, child);
+
+    return schema;
+
+  }
+
+  /**
+   * Set Custom Function
+   *
+   * This is setting a function which is already set
+   * to this instance of the class
+   *
+   * @param {string} customFunc
+   * @param {*} value
+   * @param {*} defaultValue
+   * @returns {*}
+   * @private
+   */
+  protected _setCustomFunction (customFunc: string, value: any, defaultValue: any): any {
+    value = (<any> this)[customFunc](value, defaultValue);
+
+    if (_.isUndefined(value)) {
+      value = defaultValue;
+    }
+
+    return value;
+  }
+
+  /**
+   * Set Primary Key
+   *
+   * Sets the primary key
+   *
+   * @param {string} key
+   * @private
+   */
+  protected _setPrimaryKey (key: string) {
+
+    if (this.getPrimaryKey() === null) {
+      this.PrimaryKey = key;
+    } else {
+      throw new Error("CANNOT_SET_MULTIPLE_PRIMARY_KEYS");
+    }
+  }
+
+  /**
+   * Set Standard Function
+   *
+   * This is setting a standard function which actually
+   * a function
+   *
+   * @param {function} type
+   * @param {*} value
+   * @param {*} defaultValue
+   * @returns {*}
+   * @private
+   */
+  protected _setStandardFunction (type: any, value: any, defaultValue: any): any {
+
+    if (value instanceof type === false) {
+
+      /* No - populate the instance if something set */
+      let createNew = false;
+
+      if (_.isArray(value)) {
+        createNew = true;
+      } else {
+        value = Base.datatypes.setObject(value, defaultValue);
+        createNew = value !== defaultValue;
+      }
+
+      if (createNew) {
+        value = new type(value);
+      }
+
+    }
+
+    return value;
+
+  }
+
+  /**
+   * Set String Function
+   *
+   * We're setting a function that's a description
+   * of how we want to set it
+   *
+   * @param {string} type
+   * @param {*} value
+   * @param {*} defaultValue
+   * @param {*} definition
+   * @returns {*}
+   * @private
+   */
+  protected _setStringFunction (type: string, value: any, defaultValue: any, definition: any): any {
+
+    switch (type) {
+
+      case "enum":
+        value = Base.datatypes.setEnum(value, definition.enum, defaultValue);
+        break;
+
+      case "mixed":
+        if (_.isUndefined(value)) {
+          value = defaultValue;
+        }
+        break;
+
+      default:
+        if (_.has(dataCasting, type)) {
+
+          let fnName: string = (<any> dataCasting)[type];
+          let fn: Function = (<any> Base.datatypes)[fnName];
+
+          value = fn(value, defaultValue);
+
+        } else {
+          /* Unknown datatype */
+          throw new TypeError(`Definition.type '${type}' is not valid`);
+        }
+        break;
+    }
+
+    return value;
+
+  }
 
 }

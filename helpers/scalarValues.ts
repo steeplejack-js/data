@@ -20,7 +20,7 @@ import * as _ from "lodash";
  * @param {*} value
  * @returns {*}
  */
-export function scalarValues (value: any) : any {
+export function scalarValues (value: any): any {
 
   if (_.isObject(value)) {
     /* Set objects to strings */
