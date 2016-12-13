@@ -4,7 +4,7 @@
   "description": "The Steeplejack data modelling",
   "main": "index.js",
   "scripts": {
-    "clean": "rm -Rf ./coverage ./tmp",
+    "clean": "rm -Rf *.js *.js.map *.d.ts **/*.js **/*.js.map **/*.d.ts ./coverage ./tmp",
     "ci": "npm test -s && npm run coverage -s && npm run compile -s",
     "compile": "npm run clean && tsc",
     "compile:all": "npm run clean && tsc --outDir ./tmp && cp ./exception/index* ./tmp/exception",
