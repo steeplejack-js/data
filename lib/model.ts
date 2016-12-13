@@ -546,7 +546,7 @@ export abstract class Model extends Base {
       /* Set the default value */
       (<any> this)[key] = void 0;
 
-    }, {});
+    });
 
   }
 
