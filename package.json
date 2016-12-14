@@ -3,12 +3,37 @@
   "version": "0.0.0",
   "description": "The Steeplejack data modelling",
   "main": "index.js",
+  "nyc": {
+    "all": true,
+    "check-coverage": true,
+    "cache": true,
+    "lines": 100,
+    "statements": 100,
+    "functions": 100,
+    "branches": 100,
+    "include": [
+      "**/*.ts"
+    ],
+    "exclude": [
+      "node_modules"
+    ],
+    "reporter": [
+      "lcov",
+      "text-summary"
+    ],
+    "require": [],
+    "sourceMap": false,
+    "instrument": false
+  },
   "scripts": {
     "clean": "rimraf *.js *.js.map *.d.ts {helpers,interfaces,lib,test/**/**/}/**/*.js {helpers,interfaces,lib,test/**/**/}/**/*.js.map {helpers,interfaces,lib,test/**/**/}/**/*.d.ts ./coverage ./tmp",
     "ci": "npm test -s && npm run coverage -s && npm run compile -s",
-    "compile": "npm run clean && tsc",
-    "compile:all": "npm run clean && tsc --outDir ./tmp",
-    "coverage": "nyc mocha --compilers ts:ts-node/register --throw-deprecation --ui bdd --full-trace --recursive test/unit",
+    "compile": "npm run clean -s && tsc",
+    "compile:all": "npm run clean -s && tsc --outDir ./tmp",
+    "coverage": "npm run compile:all -s && npm run coverage:report -s && npm run coverage:remap:html -s && npm run coverage:remap:json -s && npm run coverage:check -s",
+    "coverage:check": "istanbul check-coverage ./coverage/coverage.json --statements=100 --functions=100 --branches=100 --lines=100",
+    "coverage:remap:html": "remap-istanbul -i ./coverage/coverage.json -o ./coverage/lcov-report -t html",
+    "coverage:remap:json": "remap-istanbul -i ./coverage/coverage.json -o ./coverage/coverage.json",
     "coverage:report": "istanbul cover _mocha ./tmp/test/unit/ -- --recursive ./tmp/test/unit",
     "postversion": "git push --tags && git push",
     "test": "npm run test:lint -s && npm run test:unit -s",
@@ -54,7 +79,7 @@
     "mocha": "^3.2.0",
     "nodemon": "^1.11.0",
     "proxyquire": "^1.7.10",
-    "remap-istanbul": "^0.7.0",
+    "remap-istanbul": "^0.8.0",
     "rimraf": "^2.5.4",
     "sinon": "^1.17.6",
     "sinon-as-promised": "^4.0.2",
