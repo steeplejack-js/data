@@ -64,6 +64,7 @@ export abstract class Collection extends Base {
    */
   public constructor (data: Object[] = null) {
 
+    /* istanbul ignore next */
     super();
 
     /* Add in anything passed in */

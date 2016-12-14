@@ -128,6 +128,7 @@ export abstract class Model extends Base {
    */
   public constructor (data: any = {}) {
 
+    /* istanbul ignore next */
     super();
 
     this._configureDefinition();

@@ -29,7 +29,7 @@
     "clean": "rimraf *.js *.js.map *.d.ts {helpers,interfaces,lib,test/**/**/}/**/*.js {helpers,interfaces,lib,test/**/**/}/**/*.js.map {helpers,interfaces,lib,test/**/**/}/**/*.d.ts ./coverage ./tmp",
     "ci": "npm test -s && npm run coverage -s && npm run compile -s",
     "compile": "npm run clean -s && tsc",
-    "compile:all": "npm run clean -s && tsc --outDir ./tmp",
+    "compile:all": "npm run clean -s && tsc --removeComments false --outDir ./tmp",
     "coverage": "npm run compile:all -s && npm run coverage:report -s && npm run coverage:remap:html -s && npm run coverage:remap:json -s && npm run coverage:check -s",
     "coverage:check": "istanbul check-coverage ./coverage/coverage.json --statements=100 --functions=100 --branches=100 --lines=100",
     "coverage:remap:html": "remap-istanbul -i ./coverage/coverage.json -o ./coverage/lcov-report -t html",
