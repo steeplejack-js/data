@@ -11,16 +11,14 @@
 
 /* Third-party modules */
 import {Base, ValidationException} from "@steeplejack/core";
-import * as _ from "lodash";
-import * as uuid from "node-uuid";
+import { _ } from "lodash";
+import uuid from "node-uuid";
 
 /* Files */
 import {sortAsc, sortDesc} from "../helpers/sorting";
-import {ICollectionData} from "../interfaces/collectionData";
-import {ISortProperty} from "../interfaces/sortProperty";
-import {Model} from "./model";
+import Model from "./model";
 
-export abstract class Collection extends Base {
+module.exports = class Collection extends Base {
 
   /**
    * To Models
@@ -33,7 +31,7 @@ export abstract class Collection extends Base {
    * @param {Object[]} data
    * @returns {Collection}
    */
-  public static toModels(data: Object[] = null): Collection {
+  static toModels(data = null) {
 
     /* Create a new instance of this collection with default data */
     let collection = Object.create(this.prototype);
@@ -51,10 +49,6 @@ export abstract class Collection extends Base {
 
   }
 
-  protected Data: any = {};
-
-  protected Order: string[] = [];
-
   /**
    * Constructor
    *
@@ -62,10 +56,14 @@ export abstract class Collection extends Base {
    *
    * @param {Object[]} data
    */
-  public constructor (data: Object[] = null) {
+  constructor (data = null) {
 
     /* istanbul ignore next */
     super();
+
+    this.Data = {};
+
+    this.Order = [];
 
     /* Add in anything passed in */
     this.add(data);
@@ -80,7 +78,7 @@ export abstract class Collection extends Base {
    * @param {Object[]} data
    * @returns {Collection}
    */
-  public add (data: Object[] = null): Collection {
+  add (data = null) {
 
     /* Ensure we've got an array */
     if (_.isArray(data)) {
@@ -101,16 +99,16 @@ export abstract class Collection extends Base {
    * @param {any} data
    * @returns {string}
    */
-  public addOne (data: any = null): string {
+  addOne (data = null) {
 
     if (_.isObject(data) && _.isArray(data) === false) {
 
-      let model: Model;
-      let ModelConstructor: any = this._model();
+      let model;
+      const ModelConstructor = this._model();
 
       if (data instanceof ModelConstructor) {
         /* It's already an instance of the model */
-        model = <Model> data;
+        model = data;
       } else {
         /* Convert the data into an instance of the model */
         model = new ModelConstructor(data);
@@ -141,7 +139,7 @@ export abstract class Collection extends Base {
    * @param {object} thisArg
    * @returns {Collection}
    */
-  public each (iterator: Function, thisArg: Object = null): Collection {
+  each (iterator, thisArg = null) {
 
     if (_.isFunction(iterator) === false) {
       throw new TypeError("iterator must be a function");
@@ -149,7 +147,7 @@ export abstract class Collection extends Base {
 
     let collection = this.getAll();
 
-    _.each(collection, (data: ICollectionData) => {
+    _.each(collection, data => {
       return iterator.call(thisArg, data.model, data.id, collection);
     });
 
@@ -167,7 +165,7 @@ export abstract class Collection extends Base {
    * @param {object} thisArg
    * @returns {Collection}
    */
-  public eachRight (iterator: Function, thisArg: Object = null): Collection {
+  eachRight (iterator, thisArg = null) {
 
     if (_.isFunction(iterator) === false) {
       throw new TypeError("iterator must be a function");
@@ -175,7 +173,7 @@ export abstract class Collection extends Base {
 
     let collection = this.getAll();
 
-    _.eachRight(collection, (data: ICollectionData) => {
+    _.eachRight(collection, data => {
       return iterator.call(thisArg, data.model, data.id, collection);
     });
 
@@ -192,9 +190,9 @@ export abstract class Collection extends Base {
    * @param {object} properties
    * @returns {Collection}
    */
-  public filter (properties: Object): Collection {
+  filter (properties) {
 
-    this.each((model: Model, id: string) => {
+    this.each((model, id) => {
       if (model.where(properties)) {
         /* Remove this from the collection */
         this.removeById(id);
@@ -216,11 +214,11 @@ export abstract class Collection extends Base {
    * @param {object} properties
    * @returns {null}
    */
-  public find (properties: Object): Model {
+  find (properties) {
 
-    let result: Model = null;
+    let result = null;
 
-    this.each((model: Model) => {
+    this.each(model => {
       if (result === null && model.where(properties)) {
         result = model;
       }
@@ -240,11 +238,11 @@ export abstract class Collection extends Base {
    * @param {object} properties
    * @returns {Model}
    */
-  public findLast (properties: Object): Model {
+  findLast (properties) {
 
-    let result: Model = null;
+    let result = null;
 
-    this.eachRight((model: Model) => {
+    this.eachRight(model => {
       if (result === null && model.where(properties)) {
         result = model;
       }
@@ -259,10 +257,10 @@ export abstract class Collection extends Base {
    *
    * Returns the data array
    *
-   * @returns {ICollectionData[]}
+   * @returns {[]}
    */
-  public getAll (): ICollectionData[] {
-    return _.map(this.Order, (id: string) => {
+  getAll () {
+    return _.map(this.Order, id => {
       return {
         id,
         model: this.Data[id],
@@ -279,10 +277,10 @@ export abstract class Collection extends Base {
    * @param ids
    * @returns {Model[]}
    */
-  public getAllById (ids: string[]): Model[] {
+  getAllById (ids) {
 
     /* Get the keys for the models */
-    let keys = _.reduce(this.getAll(), (result: any, data: ICollectionData, key: number) => {
+    let keys = _.reduce(this.getAll(), (result, data, key) => {
 
       if (_.indexOf(ids, data.id) !== -1) {
         result.push(key);
@@ -305,9 +303,9 @@ export abstract class Collection extends Base {
    * @param {number[]} id
    * @returns {Model[]}
    */
-  public getAllByKey (id: number[]): Model[] {
+  getAllByKey (id) {
 
-    return _.reduce(this.getAll(), (result: any, data: ICollectionData, key: number) => {
+    return _.reduce(this.getAll(), (result, data, key) => {
 
       if (_.indexOf(id, key) !== -1) {
         result.push(data.model);
@@ -328,10 +326,10 @@ export abstract class Collection extends Base {
    * @param {Model[]} models
    * @returns {Model[]}
    */
-  public getAllByModel (models: Model[]): Model[] {
+  getAllByModel (models) {
 
     /* Get the IDs for the models */
-    let keys = _.reduce(this.getAll(), (result: any, data: ICollectionData, key: number) => {
+    let keys = _.reduce(this.getAll(), (result, data, key) => {
 
       if (_.indexOf(models, data.model) !== -1) {
         result.push(key);
@@ -353,7 +351,7 @@ export abstract class Collection extends Base {
    * @param id
    * @returns {any}
    */
-  public getById (id: string): Model {
+  getById (id) {
 
     let models = this.getAllById([
       id,
@@ -376,7 +374,7 @@ export abstract class Collection extends Base {
    * @param {number} id
    * @returns {Model}
    */
-  public getByKey (id: number): Model {
+  getByKey (id) {
 
     let models = this.getAllByKey([
       id,
@@ -398,7 +396,7 @@ export abstract class Collection extends Base {
    * @param {Model} model
    * @returns {Model}
    */
-  public getByModel (model: Model): Model {
+  getByModel (model) {
 
     let models = this.getAllByModel([
       model,
@@ -419,7 +417,7 @@ export abstract class Collection extends Base {
    *
    * @returns {number}
    */
-  public getCount () {
+  getCount () {
     return _.size(this.getAll());
   }
 
@@ -431,8 +429,8 @@ export abstract class Collection extends Base {
    * @param {boolean} parse
    * @returns {any[]}
    */
-  public getData (parse: boolean = void 0): any[] {
-    return _.map(this.getAll(), (item: ICollectionData) => {
+  getData (parse = void 0) {
+    return _.map(this.getAll(), item => {
       return item.model.getData(parse);
     });
   }
@@ -444,8 +442,8 @@ export abstract class Collection extends Base {
    *
    * @returns {string[]}
    */
-  public getIds (): string[] {
-    return _.map(this.getAll(), (item: ICollectionData) => {
+  getIds () {
+    return _.map(this.getAll(), item => {
       return item.id;
     });
   }
@@ -457,7 +455,7 @@ export abstract class Collection extends Base {
    *
    * @returns {Object}
    */
-  public getModel (): any {
+  getModel () {
     return this._model();
   }
 
@@ -477,7 +475,7 @@ export abstract class Collection extends Base {
    * @param {number} offset
    * @returns {Collection}
    */
-  public limit (limit: number, offset: number = 0): Collection {
+  limit (limit, offset = 0) {
 
     limit = Base.datatypes.setInt(limit, null);
 
@@ -499,7 +497,7 @@ export abstract class Collection extends Base {
       /* Work out which keys to remove */
       let removeKeys = _.difference(keys, keys.slice(offset, endKey));
 
-      _.each(removeKeys, (key: string) => {
+      _.each(removeKeys, key => {
         this.removeById(key);
       });
 
@@ -517,7 +515,7 @@ export abstract class Collection extends Base {
    *
    * @returns {boolean}
    */
-  public reset (): boolean {
+  reset () {
 
     if (_.isEmpty(this.Data)) {
       /* Nothing to do - it's already empty */
@@ -539,7 +537,7 @@ export abstract class Collection extends Base {
    * @param {string} id
    * @returns {boolean}
    */
-  public removeById (id: string): boolean {
+  removeById (id) {
 
     if (_.has(this.Data, id)) {
 
@@ -571,11 +569,11 @@ export abstract class Collection extends Base {
    * @param {Model} removeModel
    * @returns {boolean}
    */
-  public removeByModel (removeModel: Model): boolean {
+  removeByModel (removeModel) {
 
     let removed = false;
 
-    _.each(this.Data, (model: Model, id: string) => {
+    _.each(this.Data, (model, id) => {
       if (removeModel === model) {
         removed = this.removeById(id);
       }
@@ -596,7 +594,7 @@ export abstract class Collection extends Base {
    * @param {function} fn
    * @returns {Collection}
    */
-  public sort (fn: (a: any, b: any) => number): Collection {
+  sort (fn) {
 
     if (_.isFunction(fn) === false) {
       throw new TypeError("Collection.sort must receive a function");
@@ -609,7 +607,7 @@ export abstract class Collection extends Base {
     sorted.sort(fn);
 
     /* Change the order array */
-    this.Order = _.reduce(sorted, (result: string[], data: ICollectionData) => {
+    this.Order = _.reduce(sorted, (result, data) => {
       result.push(data.id);
 
       return result;
@@ -631,14 +629,14 @@ export abstract class Collection extends Base {
    * @param {ISortProperty} properties
    * @returns {Collection}
    */
-  public sortBy (properties: ISortProperty ): Collection {
+  sortBy (properties) {
 
     if (_.isPlainObject(properties) === false) {
       throw new TypeError("Collection.sortBy must receive an object of keys and directions");
     }
 
     /* Build a search object */
-    let search = _.reduce(properties, (result: any, order: string, key: string) => {
+    const search = _.reduce(properties, (result, order, key) => {
 
       /* Default to ascending */
       result[key] = order.toUpperCase() === "DESC" ? sortDesc : sortAsc;
@@ -648,7 +646,7 @@ export abstract class Collection extends Base {
     }, {});
 
     /* Dispatch to the sort method */
-    return this.sort((a: ICollectionData, b: ICollectionData) => {
+    return this.sort((a, b) => {
 
       let keys = _.keys(search);
       let keyLength = keys.length;
@@ -691,8 +689,8 @@ export abstract class Collection extends Base {
    *
    * @returns {TResult[]}
    */
-  public toDb (): any {
-    return _.map(this.getAll(), (item: ICollectionData) => {
+  toDb () {
+    return _.map(this.getAll(), item => {
       return item.model.toDb();
     });
   }
@@ -704,17 +702,17 @@ export abstract class Collection extends Base {
    *
    * @returns {boolean}
    */
-  public validate (): boolean {
+  validate () {
 
-    let collectionErr = new ValidationException("Collection validation error");
+    const collectionErr = new ValidationException("Collection validation error");
 
-    _.each(this.getAll(), (item: ICollectionData, id: number) => {
+    _.each(this.getAll(), (item, id) => {
 
       try {
         item.model.validate();
       } catch (err) {
 
-        _.each(err.getErrors(), (list: any[], key: string) => {
+        _.each(err.getErrors(), (list, key) => {
 
           _.each(list, (error) => {
 
@@ -746,9 +744,9 @@ export abstract class Collection extends Base {
    * @param {object} properties
    * @returns {Collection}
    */
-  public where (properties: Object): Collection {
+  where (properties) {
 
-    this.each((model: Model, id: string) => {
+    this.each((model, id) => {
 
       if (model.where(properties) === false) {
         /* Remove from the collection */
@@ -761,6 +759,4 @@ export abstract class Collection extends Base {
 
   }
 
-  protected abstract _model (): Object;
-
-}
+};

@@ -21,7 +21,7 @@
 
 /* Files */
 
-export const dataCasting = {
+module.exports = {
   array: "setArray",
   boolean: "setBool",
   date: "setDate",

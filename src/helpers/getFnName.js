@@ -5,7 +5,7 @@
 /* Node modules */
 
 /* Third-party modules */
-import * as _ from "lodash";
+import { _ } from "lodash";
 
 /* Files */
 
@@ -22,7 +22,7 @@ import * as _ from "lodash";
  * @param {string} keyName
  * @returns {string}
  */
-export function getFnName (prefix: string, keyName: string) {
+module.exports = (prefix, keyName) => {
   keyName = _.capitalize(keyName);
   return prefix + keyName;
-}
+};

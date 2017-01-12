@@ -19,7 +19,7 @@
  * @param {*} b
  * @returns {number}
  */
-export function sortAsc (a: any, b: any): number {
+const sortAsc = (a, b) => {
   if (a < b) {
     return -1;
   } else if (a > b) {
@@ -27,7 +27,7 @@ export function sortAsc (a: any, b: any): number {
   } else {
     return 0;
   }
-}
+};
 
 /**
  * Sort DESC
@@ -38,7 +38,7 @@ export function sortAsc (a: any, b: any): number {
  * @param {*} b
  * @returns {number}
  */
-export function sortDesc (a: any, b: any): number {
+const sortDesc = (a, b) => {
   if (a < b) {
     return 1;
   } else if (a > b) {
@@ -46,4 +46,9 @@ export function sortDesc (a: any, b: any): number {
   } else {
     return 0;
   }
-}
+};
+
+module.exports = {
+  sortAsc,
+  sortDesc
+};

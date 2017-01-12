@@ -7,10 +7,10 @@
 /* Third-party modules */
 
 /* Files */
-import {Collection} from "./lib/collection";
-import {Model} from "./lib/model";
+import Collection from "./lib/collection";
+import Model from "./lib/model";
 
-export {
+module.exports = {
   Collection,
   Model,
 };

@@ -7,15 +7,13 @@
 /* Node modules */
 
 /* Third-party modules */
-import {Base} from "@steeplejack/core";
-import * as _ from "lodash";
+import { Base } from "@steeplejack/core";
+import { _ } from "lodash";
 
 /* Files */
-import {IDefinitionValidation} from "../interfaces/definitionValidation";
-import {IModelDefinition} from "../interfaces/modelDefinition";
 import {Validation} from "./validation";
 
-export class Definition implements IModelDefinition {
+module.exports = class Definition {
 
   /**
    * To Definition
@@ -26,7 +24,7 @@ export class Definition implements IModelDefinition {
    * @param {*} data
    * @returns {Definition}
    */
-  public static toDefinition (name: string, data: any): Definition {
+  public static toDefinition (name, data) {
 
     return new Definition({
       column: data.column === null ? null : data.column || name,
@@ -40,19 +38,11 @@ export class Definition implements IModelDefinition {
 
   }
 
-  public type: any;
-  public value: any;
-  public column: any;
-  public primaryKey: boolean;
-  public validation: IDefinitionValidation[];
-  public enum: any[];
-  public settings: any;
+  public constructor (data = null) {
 
-  public constructor (data: IModelDefinition = null) {
+    let options = _.isObject(data) ? data : {};
 
-    let options: any = _.isObject(data) ? data : {};
-
-    let type: any = null;
+    let type = null;
     if (_.isString(options.type) || _.isFunction(options.type)) {
       type = options.type;
     }
@@ -81,13 +71,13 @@ export class Definition implements IModelDefinition {
    * @param {Array|object} rule
    * @returns {Definition}
    */
-  public addValidation (rule: IDefinitionValidation[] = null): Definition {
+  public addValidation (rule = null) {
 
     if (_.isArray(rule)) {
 
-      _.each(rule, (item) => {
+      _.each(rule, item => {
 
-        let validateFn: any = Validation.generateFunction(item, this.value);
+        let validateFn = Validation.generateFunction(item, this.value);
 
         this.validation.push(validateFn);
 
@@ -107,7 +97,7 @@ export class Definition implements IModelDefinition {
    * @param {string} setting
    * @returns {*}
    */
-  public getSetting (setting: string): any {
+  public getSetting (setting) {
     return this.settings[setting];
   }
 
@@ -118,8 +108,8 @@ export class Definition implements IModelDefinition {
    *
    * @returns {boolean}
    */
-  public hasPrimaryKey (): boolean {
+  public hasPrimaryKey () {
     return this.primaryKey;
   }
 
-}
+};

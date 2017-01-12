@@ -11,17 +11,15 @@
 
 /* Third-party modules */
 import {Base, ValidationException} from "@steeplejack/core";
-import * as _ from "lodash";
+import { _ } from "lodash";
 
 /* Files */
-import {dataCasting} from "../helpers/dataCasting";
-import {getFnName} from "../helpers/getFnName";
-import {scalarValues} from "../helpers/scalarValues";
-import {IDefinitionColumns} from "../interfaces/definitionColumns";
-import {IModelDefinition} from "../interfaces/modelDefinition";
-import {Definition} from "./definition";
+import dataCasting from "../helpers/dataCasting";
+import getFnName from "../helpers/getFnName";
+import scalarValues from "../helpers/scalarValues";
+import Definition from "./definition";
 
-export abstract class Model extends Base {
+module.exports = class Model extends Base {
 
   /**
    * Merge
@@ -35,7 +33,7 @@ export abstract class Model extends Base {
    * @param {*} sources
    * @returns {*}
    */
-  public static merge (object: any, ...sources: any[]): any {
+  static merge (object, ...sources) {
     return _.defaultsDeep(object, ...sources);
   }
 
@@ -50,13 +48,13 @@ export abstract class Model extends Base {
    * @param {any} data
    * @returns {Model}
    */
-  public static toModel (data: any = {}): Model {
+  static toModel (data = {}) {
 
     /* Create a new instance of this model with default data */
-    let model = Object.create(this.prototype);
+    const model = Object.create(this.prototype);
     this.apply(model, []);
 
-    let definition: IDefinitionColumns[] = model.getColumnKeys();
+    let definition = model.getColumnKeys();
 
     /* Set the column data to the model */
     _.each(definition, (item) => {
@@ -87,55 +85,35 @@ export abstract class Model extends Base {
 
   }
 
-  /**
-   * Data
-   *
-   * This is where the raw model data lives. Ignore
-   * this and use the get/set methods to access
-   * it.
-   *
-   * @type {{}}
-   * @private
-   */
-  protected Data: any = {};
-
-  /**
-   * Definition
-   *
-   * This is your definition objects that control
-   * how the model behaves.
-   *
-   * @type {{}}
-   * @private
-   */
-  protected Definition: any = {};
-
-  /**
-   * Primary Key
-   *
-   * Defines the primary key on the model. This
-   * is optional.
-   *
-   * @type {null}
-   * @private
-   */
-  protected PrimaryKey: string = null;
 
   /**
    * Constructor
    *
    * @param {object} data
    */
-  public constructor (data: any = {}) {
+  constructor (data = {}) {
 
     /* istanbul ignore next */
     super();
 
+    /*
+     This is where the raw model data lives. Ignore
+     this and use the get/set methods to access
+     it.
+    */
+    this.Data = {};
+
+    /* This is your definition objects that control how the model behaves */
+    this.Definition = {};
+
+    /* Defines the primary key on the model. This is optional */
+    this.PrimaryKey = null;
+
     this._configureDefinition();
 
     /* Set the data to the model */
-    _.each(data, (value: any, key: string) => {
-      (<any> this)[key] = value;
+    _.each(data, (value, key) => {
+      this[key] = value;
     });
 
   }
@@ -148,18 +126,18 @@ export abstract class Model extends Base {
    * @param {string} key
    * @returns {any}
    */
-  public get (key: string): any {
+  get (key) {
 
-    /* Look for a protected method first */
+    /* Look for a method first */
     let customFunc = getFnName("_get", key);
 
     /* Get the current value */
-    let currentValue: any = (_.has(this.Data, key)) ? this.Data[key] : void 0;
+    let currentValue = (_.has(this.Data, key)) ? this.Data[key] : void 0;
 
-    if (_.isFunction((<any> this)[customFunc])) {
+    if (_.isFunction(this[customFunc])) {
 
       /* Use the custom function */
-      return (<any> this)[customFunc](currentValue);
+      return this[customFunc](currentValue);
 
     } else {
 
@@ -176,11 +154,11 @@ export abstract class Model extends Base {
    * Gets the keys and the column name
    * as an array of objects
    *
-   * @returns {IDefinitionColumns[]}
+   * @returns {*[]}
    */
-  public getColumnKeys (): IDefinitionColumns[] {
+  getColumnKeys () {
 
-    return _.reduce(this.Definition, (result: any, definition: Definition, key: string) => {
+    return _.reduce(this.Definition, (result, definition, key) => {
 
       result.push({
         column: definition.column,
@@ -209,9 +187,9 @@ export abstract class Model extends Base {
    * @param {boolean} parse
    * @returns {any}
    */
-  public getData (parse: boolean = true): any {
+  getData (parse = true) {
 
-    return _.reduce(this.Data, (result: any, data: any, key: string) => {
+    return _.reduce(this.Data, (result, data, key) => {
 
       if (_.isObject(data) && _.isFunction(data.getData)) {
         data = data.getData();
@@ -237,7 +215,7 @@ export abstract class Model extends Base {
    * @param {string} key
    * @returns {Definition|null}
    */
-  public getDefinition (key: string): Definition {
+  getDefinition (key) {
     return this.Definition[key] || null;
   }
 
@@ -248,7 +226,7 @@ export abstract class Model extends Base {
    *
    * @return {string}
    */
-  public getPrimaryKey () {
+  getPrimaryKey () {
     return this.PrimaryKey;
   }
 
@@ -259,7 +237,7 @@ export abstract class Model extends Base {
    *
    * @returns {*}
    */
-  public getPrimaryKeyValue () {
+  getPrimaryKeyValue () {
     return this.get(this.getPrimaryKey());
   }
 
@@ -271,7 +249,7 @@ export abstract class Model extends Base {
    *
    * @returns {*}
    */
-  public getSchema (): any {
+  getSchema () {
     return this._schema() || {};
   }
 
@@ -290,7 +268,7 @@ export abstract class Model extends Base {
    * @param {any} value
    * @returns {Model}
    */
-  public set (key: string, value: any = void 0): Model {
+  set (key, value = void 0) {
 
     let definition = this.getDefinition(key);
 
@@ -302,7 +280,7 @@ export abstract class Model extends Base {
     let customFunc = getFnName("_set", key);
     let defaultValue = definition.value;
 
-    if (_.isFunction((<any> this)[customFunc])) {
+    if (_.isFunction(this[customFunc])) {
 
       value = this._setCustomFunction(customFunc, value, defaultValue);
 
@@ -340,17 +318,17 @@ export abstract class Model extends Base {
    *
    * @returns {any}
    */
-  public toDb (): any {
+  toDb () {
 
-    return _.reduce(this.Definition, (result: any, definition: Definition, key: string) => {
+    return _.reduce(this.Definition, (result, definition, key) => {
 
       /* Get the column name */
-      let column: string = definition.column;
+      const column = definition.column;
 
       /* Ignore null columns */
       if (column !== null) {
 
-        let data: any = (<any> this)[key];
+        let data = this[key];
 
         /* If it's an instance of the model, get the DB representation */
         if (_.isObject(data) && _.isFunction(data.toDb)) {
@@ -376,16 +354,16 @@ export abstract class Model extends Base {
    *
    * @returns {boolean}
    */
-  public validate () {
+  validate () {
 
     /* Create a validation error - will put any errors here */
     let validation = new ValidationException("Model validation error");
 
     /* Run through each of the definitions for the validation rules */
-    _.each(this.Definition, (definition: Definition, key: string) => {
+    _.each(this.Definition, (definition, key) => {
 
       /* Get the current value */
-      let value: any = this.get(key);
+      let value = this.get(key);
 
       if (_.isObject(value) && _.isFunction(value.validate)) {
 
@@ -394,7 +372,7 @@ export abstract class Model extends Base {
           value.validate();
         } catch (err) {
 
-          _.each(err.getErrors(), (list: any[], errKey: string) => {
+          _.each(err.getErrors(), (list, errKey) => {
 
             _.each(list, (error) => {
 
@@ -414,7 +392,7 @@ export abstract class Model extends Base {
       }
 
       /* Cycle through the validation rules */
-      _.each(definition.validation, (rule: Function) => {
+      _.each(definition.validation, rule => {
 
         try {
           /* A validation function can throw error or return false */
@@ -453,7 +431,7 @@ export abstract class Model extends Base {
    * @param {object} properties
    * @returns {boolean}
    */
-  public where (properties: Object): boolean {
+  where (properties) {
 
     /* Throw error if non-object */
     if (_.isPlainObject(properties) === false) {
@@ -469,7 +447,7 @@ export abstract class Model extends Base {
     let tmp = this.clone();
 
     /* Create a target object - the values we want to check */
-    let target = _.reduce(properties, (result: any, value: any, key: string) => {
+    let target = _.reduce(properties, (result, value, key) => {
 
       /* Set the value to the model so in the right format */
       tmp.set(key, value);
@@ -483,7 +461,7 @@ export abstract class Model extends Base {
     }, {});
 
     /* Get the current values for each of the properties */
-    let current = _.reduce(properties, (result: any, value: any, key: string) => {
+    let current = _.reduce(properties, (result, value, key) => {
 
       value = scalarValues(this.get(key));
 
@@ -508,7 +486,9 @@ export abstract class Model extends Base {
    *
    * @private
    */
-  protected abstract _schema (child?: any): any;
+   _schema (child = {}) {
+     throw new SyntaxError('_schema method must be defined on a model instance');
+  }
 
   /**
    * Configure Definition
@@ -518,10 +498,10 @@ export abstract class Model extends Base {
    *
    * @private
    */
-  protected _configureDefinition (): void {
+  _configureDefinition () {
 
     /* Written like this (not with _.reduce) as the setter needs to access the definition */
-    _.each(this.getSchema(), (schemaItem: IModelDefinition, key: string) => {
+    _.each(this.getSchema(), (schemaItem, key) => {
 
       let definition = Definition.toDefinition(key, schemaItem);
 
@@ -536,16 +516,12 @@ export abstract class Model extends Base {
       Object.defineProperty(this, key, {
         configurable: false,
         enumerable: true,
-        get: () => {
-          return this.get(key);
-        },
-        set: (value: any) => {
-          return this.set(key, value);
-        },
+        get: () => this.get(key),
+        set: value => this.set(key, value),
       });
 
       /* Set the default value */
-      (<any> this)[key] = void 0;
+      this[key] = void 0;
 
     });
 
@@ -561,12 +537,8 @@ export abstract class Model extends Base {
    * @returns {Object}
    * @private
    */
-  protected _mergeSchemas (parent: any, child: any): any {
-
-    let schema: Object = _.extend(parent, child);
-
-    return schema;
-
+  _mergeSchemas (parent, child) {
+    return _.extend(parent, child);
   }
 
   /**
@@ -581,8 +553,8 @@ export abstract class Model extends Base {
    * @returns {*}
    * @private
    */
-  protected _setCustomFunction (customFunc: string, value: any, defaultValue: any): any {
-    value = (<any> this)[customFunc](value, defaultValue);
+  _setCustomFunction (customFunc, value, defaultValue) {
+    value = this[customFunc](value, defaultValue);
 
     if (_.isUndefined(value)) {
       value = defaultValue;
@@ -599,7 +571,7 @@ export abstract class Model extends Base {
    * @param {string} key
    * @private
    */
-  protected _setPrimaryKey (key: string) {
+  _setPrimaryKey (key) {
 
     if (this.getPrimaryKey() === null) {
       this.PrimaryKey = key;
@@ -620,7 +592,7 @@ export abstract class Model extends Base {
    * @returns {*}
    * @private
    */
-  protected _setStandardFunction (type: any, value: any, defaultValue: any): any {
+  _setStandardFunction (type, value, defaultValue) {
 
     if (value instanceof type === false) {
 
@@ -657,7 +629,7 @@ export abstract class Model extends Base {
    * @returns {*}
    * @private
    */
-  protected _setStringFunction (type: string, value: any, defaultValue: any, definition: any): any {
+  _setStringFunction (type, value, defaultValue, definition) {
 
     switch (type) {
 
@@ -674,8 +646,8 @@ export abstract class Model extends Base {
       default:
         if (_.has(dataCasting, type)) {
 
-          let fnName: string = (<any> dataCasting)[type];
-          let fn: Function = (<any> Base.datatypes)[fnName];
+          const fnName = dataCasting[type];
+          const fn = Base.datatypes[fnName];
 
           value = fn(value, defaultValue);
 
@@ -690,4 +662,4 @@ export abstract class Model extends Base {
 
   }
 
-}
+};

@@ -7,7 +7,7 @@
 /* Node modules */
 
 /* Third-party modules */
-import * as _ from "lodash";
+import { _ } from "lodash";
 
 /* Files */
 
@@ -20,7 +20,7 @@ import * as _ from "lodash";
  * @param {*} value
  * @returns {*}
  */
-export function scalarValues (value: any): any {
+module.exports = value => {
 
   if (_.isObject(value)) {
     /* Set objects to strings */
@@ -33,4 +33,4 @@ export function scalarValues (value: any): any {
 
   return value;
 
-}
+};

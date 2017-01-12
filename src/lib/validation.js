@@ -7,11 +7,10 @@
 /* Node modules */
 
 /* Third-party modules */
-import * as _ from "lodash";
+import {_} from "lodash";
 
 /* Files */
-import {IDefinitionValidation} from "../interfaces/definitionValidation";
-import {Model} from "./model";
+import Model from "./model";
 
 export class Validation {
 
@@ -30,10 +29,10 @@ export class Validation {
    * @param {boolean} isRequired
    * @returns {function(Model, any): (boolean|*)}
    */
-  public static createClosure (rule: Function, params: any[], defaultValue: any, isRequired: boolean): Function {
+  static createClosure (rule, params, defaultValue, isRequired) {
 
     /* Create closure with params */
-    return (value: any, model: Model) => {
+    return (value, model) => {
 
       if (value === defaultValue && isRequired === false) {
         /* Value is not set and not required - validate */
@@ -41,7 +40,7 @@ export class Validation {
       } else {
 
         /* Build the array to send to the rule */
-        let input: any[] = [
+        let input = [
           value,
           model,
         ];
@@ -66,10 +65,10 @@ export class Validation {
    * Creates the closure to validate the model
    * data
    *
-   * @param {IDefinitionValidation} validate
+   * @param {*} validate
    * @param {*} defaultValue
    */
-  public static generateFunction (validate: IDefinitionValidation, defaultValue: any = void 0): any {
+  static generateFunction (validate, defaultValue = void 0) {
 
     if (_.isObject(validate) === false) {
       return null;
@@ -77,33 +76,33 @@ export class Validation {
 
     let rule = validate.rule;
     let required = false;
-    let ruleFn: Function;
+    let ruleFn;
 
     if (_.isFunction(rule)) {
 
       /* We're passing a custom function to validate against */
-      ruleFn = (<Function> rule);
+      ruleFn = rule;
 
     } else if (_.isString(rule)) {
 
       /* Treat the rule as a string */
-      const ruleName: string = rule;
+      const ruleName = rule;
 
       /* Set the required status */
       required = ruleName.toUpperCase() === "REQUIRED";
 
-      if ((<string> ruleName).toUpperCase() === "MATCH") {
+      if (ruleName.toUpperCase() === "MATCH") {
         /* Use the special match rule */
         ruleFn = Validation.match;
-      } else if (_.isFunction((<any> Model.validation)[ruleName])) {
+      } else if (_.isFunction(Model.validation[ruleName])) {
 
         /* Valid rule in the validation utils package */
-        ruleFn = (value: string, model: Model, ...args: any[]) => {
+        ruleFn = (value, model, ...args) => {
 
           /* Add the value as first element */
           args.unshift(value);
 
-          return (<any> Model.validation)[ruleName](...args);
+          return Model.validation[ruleName](...args);
 
         };
 
@@ -135,13 +134,13 @@ export class Validation {
    * @param {string} key
    * @returns {boolean}
    */
-  public static match (value: any, model: Model, key: string): boolean {
+  static match (value, model, key) {
 
-    let matchValue: any = model.get(key);
+    const matchValue = model.get(key);
 
     if (matchValue !== value) {
 
-      let err: any = new Error("VALUE_DOES_NOT_MATCH");
+      const err = new Error("VALUE_DOES_NOT_MATCH");
       err.key = key;
       err.value = value;
       err.params = [
