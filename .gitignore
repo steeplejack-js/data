@@ -39,8 +39,4 @@ jspm_packages
 .idea
 .DS_Store
 tmp
-**/*.d.ts
-**/*.js
-**/*.js.map
-!exception/index.d.ts
-!exception/index.js
+build
