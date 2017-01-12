@@ -5,26 +5,25 @@
 /* Node modules */
 
 /* Third-party modules */
-import * as _ from "lodash";
-import * as uuid from "node-uuid";
+import {_} from "lodash";
+import uuid from "node-uuid";
 import {Base, ValidationException} from "@steeplejack/core";
 
 /* Files */
 import {expect, sinon} from "../../helpers/configure";
-import {Definition} from "../../../lib/definition";
-import {Model} from "../../../lib/model";
-import {Collection} from "../../../lib/collection";
-import {ICollectionData} from "../../../interfaces/collectionData";
+import Definition from "../../../src/lib/definition";
+import Model from "../../../src/lib/model";
+import Collection from "../../../src/lib/collection";
 
 const UUID_V4 = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
 
 describe("Collection test", function () {
 
-  let def: any;
+  let def;
   beforeEach(function () {
 
     class Child extends Model {
-      protected _schema () {
+      _schema () {
         return {
           boolean: {
             type: "boolean",
@@ -48,7 +47,7 @@ describe("Collection test", function () {
     }
 
     class Children extends Collection {
-      protected _model () {
+      _model () {
         return Child;
       }
     }
@@ -187,7 +186,7 @@ describe("Collection test", function () {
 
     describe("#add", function () {
 
-      let obj: any;
+      let obj;
       beforeEach(function () {
         obj = new this.Children();
 
@@ -314,7 +313,7 @@ describe("Collection test", function () {
 
     describe("#addOne", function () {
 
-      let obj: any;
+      let obj;
       beforeEach(function () {
         obj = new this.Children();
 
@@ -457,7 +456,7 @@ describe("Collection test", function () {
 
         let keys = def.getIds();
 
-        var out = def.each(function (model: any, id: string, obj: any[]) {
+        var out = def.each(function (model, id, obj) {
 
           expect(model).to.be.equal(def.getByKey(x));
           expect(id).to.be.equal(keys[x]);
@@ -538,7 +537,7 @@ describe("Collection test", function () {
 
         let keys = def.getIds();
 
-        var out = def.eachRight(function (model: any, id: string, obj: any[]) {
+        var out = def.eachRight(function (model, id, obj) {
 
           x--;
 
@@ -982,14 +981,14 @@ describe("Collection test", function () {
       it("should allow retrieval of the parsed getter data", function () {
 
         class Mod extends Model {
-          protected _schema () {
+          _schema () {
             return {
               string: {
                 type: "string"
               }
             };
           }
-          protected _getString (value: string) : string {
+          _getString (value) {
             return `hello ${value}`;
           }
         }
@@ -1030,11 +1029,11 @@ describe("Collection test", function () {
 
     describe("getters", function () {
 
-      let obj: any,
-        model1: any,
-        model2: any,
-        id1: string,
-        id2: string;
+      let obj,
+        model1,
+        model2,
+        id1,
+        id2;
       beforeEach(function () {
 
         model1 = new this.Child({
@@ -1212,8 +1211,8 @@ describe("Collection test", function () {
 
     describe("#limit", function () {
 
-      var obj: any,
-        raw: any;
+      var obj,
+        raw;
       beforeEach(function () {
 
         raw = [{
@@ -1350,8 +1349,8 @@ describe("Collection test", function () {
 
     describe("#removeById", function () {
 
-      var obj: any,
-        raw: any;
+      var obj,
+        raw;
       beforeEach(function () {
 
         raw = [{
@@ -1428,8 +1427,8 @@ describe("Collection test", function () {
 
     describe("#removeByModel", function () {
 
-      var obj: any,
-        raw: any;
+      var obj,
+        raw;
       beforeEach(function () {
 
         raw = [{
@@ -1549,13 +1548,13 @@ describe("Collection test", function () {
 
     describe("sorting", function () {
 
-      var champs: any;
+      var champs;
       beforeEach(function () {
 
         /* Define a driver model */
         class Driver extends Model {
-          protected _schema () {
-            let obj: any;
+          _schema () {
+            let obj;
             obj = {
               id: {
                 type: "integer",
@@ -1585,9 +1584,9 @@ describe("Collection test", function () {
             return obj;
           }
 
-          public setChampionYears (value: any, def: any) {
+          setChampionYears (value, def) {
             if (value instanceof Array) {
-              value.forEach((val: any) => {
+              value.forEach((val) => {
                 this.setChampionYears(val, def);
               });
             } else {
@@ -1606,7 +1605,7 @@ describe("Collection test", function () {
         }
 
         class Champions extends Collection {
-          protected _model () {
+          _model () {
             return Driver;
           }
         }
@@ -1681,12 +1680,12 @@ describe("Collection test", function () {
 
         it("should allow me to write a sort function", function () {
 
-          var arr = _.reduce(champs.getAll(), (result: any[], data: ICollectionData) => {
+          var arr = _.reduce(champs.getAll(), (result, data) => {
             result.push(data.model);
             return result;
           }, []);
 
-          var result = champs.sort((a: any, b: any) => {
+          var result = champs.sort((a, b) => {
 
             expect(a).to.be.an("object")
               .to.have.keys([
@@ -2409,11 +2408,11 @@ describe("Collection test", function () {
 
     describe("#validate", function () {
 
-      let obj: any;
+      let obj;
       beforeEach(function () {
 
         class User extends Model {
-          protected _schema () {
+          _schema () {
             return {
               id: {
                 type: "string",
@@ -2439,7 +2438,7 @@ describe("Collection test", function () {
         }
 
         class Users extends Collection {
-          protected _model () {
+          _model () {
             return User;
           }
         }

@@ -8,9 +8,7 @@
 
 /* Files */
 import {expect} from "../../helpers/configure";
-import {
-  dataCasting
-} from "../../../helpers/dataCasting";
+import dataCasting from "../../../src/helpers/dataCasting";
 
 describe("#dataCasting", function () {
 

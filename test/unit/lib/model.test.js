@@ -7,13 +7,13 @@ import {EventEmitter} from "events";
 
 /* Third-party modules */
 import {Base, ValidationException} from "@steeplejack/core";
-import * as _ from "lodash";
+import {_} from "lodash";
 
 /* Files */
 import {expect} from "../../helpers/configure";
-import {Definition} from "../../../lib/definition";
-import {Model} from "../../../lib/model";
-import {Collection} from "../../../lib/collection";
+import Definition from "../../../src/lib/definition";
+import Model from "../../../src/lib/model";
+import Collection from "../../../src/lib/collection";
 
 describe("Model test", function () {
 
@@ -25,7 +25,7 @@ describe("Model test", function () {
 
         /* Extend the model */
         class Child extends Model {
-          protected _schema () {
+          _schema () {
 
           }
         }
@@ -48,7 +48,7 @@ describe("Model test", function () {
 
           class Child extends Model {
 
-            protected _schema () {
+            _schema () {
               return {
                 array: {
                   type: "array"
@@ -126,7 +126,7 @@ describe("Model test", function () {
             string: "some string"
           });
 
-          (<any>obj1).invalid = "a string";
+          obj1.invalid = "a string";
 
           expect(obj1.getData()).to.be.eql({
             array: [
@@ -142,7 +142,7 @@ describe("Model test", function () {
             string: "some string"
           });
 
-          (<any>obj1).integer = "12345";
+          obj1.integer = "12345";
 
           expect(obj1.getData()).to.be.eql({
             array: [
@@ -164,7 +164,7 @@ describe("Model test", function () {
 
           class Child extends Model {
 
-            protected _schema () {
+            _schema () {
               return {
                 array: {
                   type: "array"
@@ -211,11 +211,11 @@ describe("Model test", function () {
           });
 
           /* Check stuff can be set */
-          (<any>obj).integer = "12345";
-          expect((<any>obj).integer).to.be.equal(12345);
+          obj.integer = "12345";
+          expect(obj.integer).to.be.equal(12345);
 
-          (<any>obj).boolean = "t";
-          expect((<any>obj).boolean).to.be.true;
+          obj.boolean = "t";
+          expect(obj.boolean).to.be.true;
 
         });
 
@@ -223,8 +223,8 @@ describe("Model test", function () {
 
           class NewModel extends Model {
 
-            protected _schema () {
-              let obj: any = {
+            _schema () {
+              let obj = {
                 key: {
                   value: null
                 }
@@ -253,7 +253,7 @@ describe("Model test", function () {
 
           class MyModel extends Model {
 
-            protected _schema () {
+            _schema () {
               return {
                 string: {
                   type: "string"
@@ -265,8 +265,8 @@ describe("Model test", function () {
 
           class Child extends Model {
 
-            protected _schema () {
-              let obj: any = {
+            _schema () {
+              let obj = {
                 id: {
                   type: "integer",
                   value: null
@@ -293,11 +293,11 @@ describe("Model test", function () {
           expect(obj).to.be.instanceof(Child)
             .instanceof(Model)
             .instanceof(Base);
-          expect((<any>obj).id).to.be.equal(2);
-          expect((<any>obj).myModel).to.be.instanceof(MyModel)
+          expect(obj.id).to.be.equal(2);
+          expect(obj.myModel).to.be.instanceof(MyModel)
             .instanceof(Model)
             .instanceof(Base);
-          expect((<any>obj).myModel).to.not.be.equal(myModel);
+          expect(obj.myModel).to.not.be.equal(myModel);
 
           expect(obj.get("myModel")).to.not.be.equal(myModel);
 
@@ -314,7 +314,7 @@ describe("Model test", function () {
 
           class MyModel extends Model {
 
-            protected _schema () {
+            _schema () {
               return {
                 string: {
                   type: "string"
@@ -326,8 +326,8 @@ describe("Model test", function () {
 
           class Child extends Model {
 
-            protected _schema () {
-              let obj: any = {
+            _schema () {
+              let obj = {
                 id: {
                   type: "integer",
                   value: null
@@ -354,8 +354,8 @@ describe("Model test", function () {
           expect(obj).to.be.instanceof(Child)
             .instanceof(Model)
             .instanceof(Base);
-          expect((<any>obj).id).to.be.equal(2);
-          expect((<any>obj).myModel).to.be.instanceof(MyModel)
+          expect(obj.id).to.be.equal(2);
+          expect(obj.myModel).to.be.instanceof(MyModel)
             .instanceof(Model)
             .instanceof(Base)
             .equal(myModel);
@@ -375,7 +375,7 @@ describe("Model test", function () {
 
           class Child extends Model {
 
-            protected _schema () {
+            _schema () {
               return {
                 array: {
                   type: "array"
@@ -451,7 +451,7 @@ describe("Model test", function () {
             string: "some string"
           });
 
-          (<any>obj1).invalid = "a string";
+          obj1.invalid = "a string";
 
           expect(obj1.getData()).to.be.eql({
             array: [
@@ -467,7 +467,7 @@ describe("Model test", function () {
             string: "some string"
           });
 
-          (<any>obj1).integer = "12345";
+          obj1.integer = "12345";
 
 
           expect(obj1.getData()).to.be.eql({
@@ -490,7 +490,7 @@ describe("Model test", function () {
 
           /* Define the model */
           class Parent extends Model {
-            protected _schema () {
+            _schema () {
               return {
                 name: {
                   type: "string"
@@ -500,7 +500,7 @@ describe("Model test", function () {
           }
 
           class Child extends Parent {
-            protected _schema () {
+            _schema () {
               return this._mergeSchemas(super._schema(), {
                 jobTitle: {
                   type: "string"
@@ -547,8 +547,8 @@ describe("Model test", function () {
 
         /* Define the model */
         class Child extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               simple: {
                 type: "string",
                 value: null
@@ -566,23 +566,23 @@ describe("Model test", function () {
           .instanceof(Child);
 
         expect(obj.get("simple")).to.be.equal("hello");
-        expect((<any>obj).simple).to.be.equal("hello");
+        expect(obj.simple).to.be.equal("hello");
 
         expect(obj.set("simple", "test")).to.be.equal(obj);
         expect(obj.get("simple")).to.be.equal("test");
-        expect((<any>obj).simple).to.be.equal("test");
+        expect(obj.simple).to.be.equal("test");
 
         expect(obj.set("simple")).to.be.equal(obj);
         expect(obj.get("simple")).to.be.null;
-        expect((<any>obj).simple).to.be.null;
+        expect(obj.simple).to.be.null;
 
-        (<any>obj).simple = "test";
+        obj.simple = "test";
         expect(obj.get("simple")).to.be.equal("test");
-        expect((<any>obj).simple).to.be.equal("test");
+        expect(obj.simple).to.be.equal("test");
 
-        (<any>obj).simple = void 0;
+        obj.simple = void 0;
         expect(obj.get("simple")).to.be.null;
-        expect((<any>obj).simple).to.be.null;
+        expect(obj.simple).to.be.null;
 
       });
 
@@ -590,8 +590,8 @@ describe("Model test", function () {
 
         /* Define the model */
         class Child extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               simple: {
                 type: "string",
                 value: null
@@ -603,7 +603,7 @@ describe("Model test", function () {
 
         let obj = new Child;
 
-        expect((<any>obj).simple).to.be.null;
+        expect(obj.simple).to.be.null;
         expect(obj.get("simple")).to.be.null;
 
       });
@@ -613,8 +613,8 @@ describe("Model test", function () {
         /* Define the model */
         class Child extends Model {
 
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               complex: {
                 type: "string",
                 value: null
@@ -623,7 +623,7 @@ describe("Model test", function () {
             return obj;
           }
 
-          protected _setComplex (value: any, defaults: any) {
+          _setComplex (value, defaults) {
 
             if (_.isString(value) && value !== defaults) {
               value = "test-" + value;
@@ -643,31 +643,31 @@ describe("Model test", function () {
           .instanceof(Child);
 
         expect(obj.get("complex")).to.be.equal("test-hello");
-        expect((<any>obj).complex).to.be.equal("test-hello");
+        expect(obj.complex).to.be.equal("test-hello");
 
         expect(obj.set("complex", "test")).to.be.equal(obj);
         expect(obj.get("complex")).to.be.equal("test-test");
-        expect((<any>obj).complex).to.be.equal("test-test");
+        expect(obj.complex).to.be.equal("test-test");
 
         expect(obj.set("complex")).to.be.equal(obj);
         expect(obj.get("complex")).to.be.null;
-        expect((<any>obj).complex).to.be.null;
+        expect(obj.complex).to.be.null;
 
-        (<any>obj).complex = "test";
+        obj.complex = "test";
         expect(obj.get("complex")).to.be.equal("test-test");
-        expect((<any>obj).complex).to.be.equal("test-test");
+        expect(obj.complex).to.be.equal("test-test");
 
-        (<any>obj).complex = void 0;
+        obj.complex = void 0;
         expect(obj.get("complex")).to.be.null;
-        expect((<any>obj).complex).to.be.null;
+        expect(obj.complex).to.be.null;
 
       });
 
       it("should use the custom getter", function () {
 
         class Child extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               complex: {
                 type: "string",
                 value: null
@@ -676,7 +676,7 @@ describe("Model test", function () {
             return obj;
           }
 
-          protected _getComplex (currentValue: any) {
+          _getComplex (currentValue) {
             return `test-${currentValue}`;
           }
         }
@@ -685,12 +685,12 @@ describe("Model test", function () {
           complex: "hello"
         });
 
-        expect((<any>obj).complex).to.be.equal("test-hello");
+        expect(obj.complex).to.be.equal("test-hello");
         expect(obj.get("complex")).to.be.equal("test-hello");
 
         obj.set("complex", "value");
 
-        expect((<any>obj).complex).to.be.equal("test-value");
+        expect(obj.complex).to.be.equal("test-value");
         expect(obj.get("complex")).to.be.equal("test-value");
 
       });
@@ -698,8 +698,8 @@ describe("Model test", function () {
       it("should use a custom get function", function () {
 
         class Child extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               string: {
                 type: "string",
                 value: null
@@ -707,7 +707,7 @@ describe("Model test", function () {
             };
             return obj;
           }
-          protected _getString (value: any) {
+          _getString (value) {
             return `Hmmm. ${value}`;
           }
         }
@@ -724,8 +724,8 @@ describe("Model test", function () {
 
         /* Define the model */
         class Child extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               str: {
                 type: "enum",
                 enum: [
@@ -743,50 +743,50 @@ describe("Model test", function () {
         });
 
         expect(obj1.get("str")).to.be.equal("value1");
-        expect((<any>obj1).str).to.be.equal("value1");
+        expect(obj1.str).to.be.equal("value1");
         obj1.set("str", "value2");
         expect(obj1.get("str")).to.be.equal("value2");
-        expect((<any>obj1).str).to.be.equal("value2");
+        expect(obj1.str).to.be.equal("value2");
         obj1.set("str", "value3");
         expect(obj1.get("str")).to.be.null;
-        expect((<any>obj1).str).to.be.null;
+        expect(obj1.str).to.be.null;
 
         var obj2 = new Child({
           str: "value2"
         });
 
         expect(obj2.get("str")).to.be.equal("value2");
-        expect((<any>obj2).str).to.be.equal("value2");
+        expect(obj2.str).to.be.equal("value2");
         obj2.set("str", "value1");
         expect(obj2.get("str")).to.be.equal("value1");
-        expect((<any>obj2).str).to.be.equal("value1");
+        expect(obj2.str).to.be.equal("value1");
         obj2.set("str", "value3");
         expect(obj2.get("str")).to.be.null;
-        expect((<any>obj2).str).to.be.null;
+        expect(obj2.str).to.be.null;
 
         var obj3 = new Child({
           str: "value3"
         });
 
         expect(obj3.get("str")).to.be.null;
-        expect((<any>obj3).str).to.be.null;
+        expect(obj3.str).to.be.null;
         obj3.set("str", "value1");
         expect(obj3.get("str")).to.be.equal("value1");
-        expect((<any>obj3).str).to.be.equal("value1");
+        expect(obj3.str).to.be.equal("value1");
         obj3.set("str", "value2");
         expect(obj3.get("str")).to.be.equal("value2");
-        expect((<any>obj3).str).to.be.equal("value2");
+        expect(obj3.str).to.be.equal("value2");
 
       });
 
       it("should clone a defaulted array value", function () {
 
-        let arr: any = [
+        let arr = [
           "hello"
         ];
 
         class Child extends Model {
-          protected _schema () {
+          _schema () {
             return {
               array: {
                 type: "array",
@@ -810,8 +810,8 @@ describe("Model test", function () {
 
         /* Define the model */
         class Child extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               simple: {
                 type: "string",
                 value: null
@@ -823,10 +823,10 @@ describe("Model test", function () {
 
         let obj = new Child;
 
-        expect((<any>obj).missing).to.be.undefined;
+        expect(obj.missing).to.be.undefined;
         expect(obj.get("missing")).to.be.undefined;
 
-        (<any>obj).missing = "hello";
+        obj.missing = "hello";
         expect(obj.set("missing", "hello")).to.be.equal(obj);
 
       });
@@ -834,7 +834,7 @@ describe("Model test", function () {
       it("should allow a mixed setter to be set, unless undefined", function () {
 
         class Child extends Model {
-          protected _schema () {
+          _schema () {
             return {
               element: {
                 type: "mixed"
@@ -854,7 +854,7 @@ describe("Model test", function () {
           0
         ].forEach(value => {
 
-          (<any>obj).element = value;
+          obj.element = value;
 
           expect(obj.get("element")).to.be.equal(value);
 
@@ -868,7 +868,7 @@ describe("Model test", function () {
 
         expect(obj.get("element")).to.be.null;
 
-        (<any>obj).element = void 0;
+        obj.element = void 0;
 
         expect(obj.get("element")).to.be.null;
 
@@ -881,7 +881,7 @@ describe("Model test", function () {
       it("should return empty array when model has no definition", function () {
 
         class Child extends Model {
-          protected _schema () {
+          _schema () {
             return {};
           }
         }
@@ -896,7 +896,7 @@ describe("Model test", function () {
       it("should return the column keys", function () {
 
         class MyModel extends Model {
-          protected _schema () {
+          _schema () {
             return {
               id: {
                 type: "string"
@@ -906,13 +906,13 @@ describe("Model test", function () {
         }
 
         class MyCollection extends Collection {
-          protected _model () {
+          _model () {
             return MyModel;
           }
         }
 
         class Element extends Model {
-          protected _schema () {
+          _schema () {
             return {
               id: {
                 type: "string"
@@ -950,8 +950,8 @@ describe("Model test", function () {
       it("should export to an object literal", function () {
 
         class Child extends Model {
-          protected _schema () {
-            let obj: any ={
+          _schema () {
+            let obj ={
               str: {
                 type: "string",
                 value: null
@@ -992,8 +992,8 @@ describe("Model test", function () {
       it("should export a Model instance", function () {
 
         class SubModel extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               str: {
                 type: "string",
                 value: null
@@ -1008,8 +1008,8 @@ describe("Model test", function () {
         }
 
         class Child extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               str: {
                 type: "string",
                 value: null
@@ -1052,8 +1052,8 @@ describe("Model test", function () {
       it("should output a value that's an instance of Collection", function () {
 
         class Child extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               string: {
                 type: "string",
                 value: null
@@ -1064,14 +1064,14 @@ describe("Model test", function () {
         }
 
         class Children extends Collection {
-          protected _model () {
+          _model () {
             return Child;
           }
         }
 
         class Test extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               str: {
                 type: "string",
                 value: null
@@ -1107,8 +1107,8 @@ describe("Model test", function () {
       it("should allow an array to be added to a Collection", function () {
 
         class Child extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               string: {
                 type: "string",
                 value: null
@@ -1119,14 +1119,14 @@ describe("Model test", function () {
         }
 
         class Children extends Collection {
-          protected _model () {
+          _model () {
             return Child;
           }
         }
 
         class Item extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               str: {
                 type: "string",
                 value: null
@@ -1162,14 +1162,14 @@ describe("Model test", function () {
       it("should export the getters value", function () {
 
         class Child extends Model {
-          protected _schema () {
+          _schema () {
             return {
               string: {
                 type: "string"
               }
             };
           }
-          protected _getString (value: string) : string {
+          _getString (value)  {
             return `hello ${value}`;
           }
         }
@@ -1199,7 +1199,7 @@ describe("Model test", function () {
       it("should return null if key not a string", function () {
 
         class Child extends Model {
-          protected _schema () {
+          _schema () {
 
           }
         }
@@ -1213,7 +1213,7 @@ describe("Model test", function () {
       it("should return null if key not a set definition", function () {
 
         class Child extends Model {
-          protected _schema () {
+          _schema () {
             return {
               string: {
                 type: "string"
@@ -1236,7 +1236,7 @@ describe("Model test", function () {
       beforeEach(function () {
 
         class MyModel extends Model {
-          protected _schema (child: any = {}) : any {
+          _schema (child = {})  {
             return Model.merge(child, {
               id: {
                 type: "string"
@@ -1249,7 +1249,7 @@ describe("Model test", function () {
         }
 
         class MySubModel1 extends MyModel {
-          protected _schema () : any {
+          _schema ()  {
             return super._schema({
               otherValue: {
                 type: "string"
@@ -1259,7 +1259,7 @@ describe("Model test", function () {
         }
 
         class MySubModel2 extends MyModel {
-          protected _schema () : any {
+          _schema ()  {
             return super._schema({
               id: {
                 type: "integer",
@@ -1348,7 +1348,7 @@ describe("Model test", function () {
       it("should convert a submodel to it's data representation", function () {
 
         class SubModel extends Model {
-          protected _schema () {
+          _schema () {
             return {
               id: {
                 type: "string",
@@ -1359,7 +1359,7 @@ describe("Model test", function () {
         }
 
         class OtherModel extends Model {
-          protected _schema () {
+          _schema () {
             return {
               id: {
                 type: "string",
@@ -1391,7 +1391,7 @@ describe("Model test", function () {
       it("should convert a collection to it's data representation", function () {
 
         class SubModel extends Model {
-          protected _schema () {
+          _schema () {
             return {
               id: {
                 type: "string",
@@ -1402,13 +1402,13 @@ describe("Model test", function () {
         }
 
         class SubCollection extends Collection {
-          protected _model () {
+          _model () {
             return SubModel;
           }
         }
 
         class OtherModel extends Model {
-          protected _schema () {
+          _schema () {
             return {
               id: {
                 type: "string",
@@ -1440,8 +1440,8 @@ describe("Model test", function () {
       it("should ignore a column set to null", function () {
 
         class Child extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               id: {
                 type: "string",
                 column: "_id"
@@ -1473,12 +1473,12 @@ describe("Model test", function () {
 
     describe("#where", function () {
 
-      var obj: any,
-        ChildModel: any;
+      var obj,
+        ChildModel;
       beforeEach(function () {
 
         class Child extends Model {
-          protected _schema () {
+          _schema () {
             return {
               boolean: {
                 type: "boolean",
@@ -1643,7 +1643,7 @@ describe("Model test", function () {
 
           /* Define the model */
           class Child extends Model {
-            protected _schema () {
+            _schema () {
               return {
                 name: {
                   type: "string",
@@ -1672,8 +1672,8 @@ describe("Model test", function () {
         it("should not throw an error when email not specified and not required", function () {
 
           class M extends Model {
-            protected _schema () {
-              let obj: any = {
+            _schema () {
+              let obj = {
                 email: {
                   type: "string",
                   value: null,
@@ -1761,7 +1761,7 @@ describe("Model test", function () {
 
           /* Define the model */
           class Child extends Model {
-            protected _schema () {
+            _schema () {
               return {
                 name: {
                   type: "string",
@@ -1899,7 +1899,7 @@ describe("Model test", function () {
 
           /* Define the model */
           class Child extends Model {
-            protected _schema () {
+            _schema () {
               return {
                 emailAddress1: {
                   type: "string",
@@ -2066,7 +2066,7 @@ describe("Model test", function () {
 
           /* Define the model */
           class Child extends Model {
-            protected _schema () {
+            _schema () {
               return {
                 name: {
                   type: "string",
@@ -2141,7 +2141,7 @@ describe("Model test", function () {
 
           /* Define the model */
           class Child extends Model {
-            protected _schema () {
+            _schema () {
               return {
                 name: {
                   type: "string",
@@ -2222,13 +2222,13 @@ describe("Model test", function () {
 
             /* Define the model */
             class Child extends Model {
-              protected _schema () {
-                let obj: any = {
+              _schema () {
+                let obj = {
                   name: {
                     type: "string",
                     validation: [
                       {
-                        rule: function (value: any) {
+                        rule: function (value) {
                           if (value === "throw") {
                             throw new Error("THROWN_ERROR");
                           }
@@ -2330,13 +2330,13 @@ describe("Model test", function () {
 
             /* Define the model */
             class Child extends Model {
-              protected _schema () {
+              _schema () {
                 return {
                   name: {
                     type: "string",
                     validation: [
                       {
-                        rule: function (value: any, objModel: any, match: any) {
+                        rule: function (value, objModel, match) {
                           if (value === "throw") {
                             throw new Error("THROWN_ERROR");
                           }
@@ -2442,13 +2442,13 @@ describe("Model test", function () {
 
             /* Define the model */
             class Child extends Model {
-              protected _schema () {
+              _schema () {
                 return {
                   name: {
                     type: "string",
                     validation: [
                       {
-                        rule: function (value: any, objModel: any, match: any, datatype: any) {
+                        rule: function (value, objModel, match, datatype) {
                           if (value === "throw") {
                             throw new Error("THROWN_ERROR");
                           }
@@ -2559,7 +2559,7 @@ describe("Model test", function () {
 
           /* Define the model */
           class Child extends Model {
-            protected _schema () {
+            _schema () {
               return {
                 password: {
                   type: "string",
@@ -2727,7 +2727,7 @@ describe("Model test", function () {
 
           /* Define the model */
           class Child extends Model {
-            protected _schema () {
+            _schema () {
               return {
                 str: {
                   type: "string",
@@ -2746,7 +2746,7 @@ describe("Model test", function () {
 
           var fail = false;
 
-          var obj: Child;
+          var obj;
           try {
             obj = new Child({
               str: "some string"
@@ -2767,7 +2767,7 @@ describe("Model test", function () {
 
           /* Define the model */
           class Child extends Model {
-            protected _schema () {
+            _schema () {
               return {
                 str: {
                   type: "string",
@@ -2784,7 +2784,7 @@ describe("Model test", function () {
 
           var fail = false;
 
-          var obj: Child;
+          var obj;
           try {
             obj = new Child({
               str: "some string"
@@ -2804,8 +2804,8 @@ describe("Model test", function () {
         it("should validate when not all keys have validation", function () {
 
           class Child extends Model {
-            protected _schema () {
-              let obj: any = {
+            _schema () {
+              let obj = {
                 id: {
                   type: "integer",
                   value: null
@@ -2880,8 +2880,8 @@ describe("Model test", function () {
         beforeEach(function () {
 
           class SubModel extends Model {
-            protected _schema () {
-              let obj: any = {
+            _schema () {
+              let obj = {
                 id: {
                   type: "string",
                   validation: [{
@@ -2894,7 +2894,7 @@ describe("Model test", function () {
                     rule: "minLength",
                     param: [2]
                   }, {
-                    rule: function (value: any) {
+                    rule: function (value) {
                       return value === "Bob";
                     }
                   }]
@@ -2906,13 +2906,13 @@ describe("Model test", function () {
           }
 
           class SubCollection extends Collection {
-            protected _model () {
+            _model () {
               return SubModel;
             }
           }
 
           class MyModel extends Model {
-            protected _schema () {
+            _schema () {
               return {
                 id: {
                   type: "string",
@@ -3082,7 +3082,7 @@ describe("Model test", function () {
         beforeEach(function () {
 
           class SubModel extends Model {
-            protected _schema () {
+            _schema () {
               return {
                 id: {
                   type: "string",
@@ -3098,7 +3098,7 @@ describe("Model test", function () {
                       2
                     ]
                   }, {
-                    rule: function (value: any) {
+                    rule: function (value) {
                       return value === "Bob";
                     }
                   }]
@@ -3109,7 +3109,7 @@ describe("Model test", function () {
 
 
           class MyModel extends Model {
-            protected _schema () {
+            _schema () {
               return {
                 id: {
                   type: "string",
@@ -3226,8 +3226,8 @@ describe("Model test", function () {
 
         /* Define the model */
         class Child extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               dataId: {
                 type: "integer",
                 value: null,
@@ -3263,8 +3263,8 @@ describe("Model test", function () {
 
         /* Define the model */
         class Child extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               dataId: {
                 type: "integer",
                 value: null,
@@ -3295,8 +3295,8 @@ describe("Model test", function () {
 
         /* Define the model */
         class Child extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               dataId: {
                 type: "integer",
                 value: null,
@@ -3333,8 +3333,8 @@ describe("Model test", function () {
 
         /* Define the model */
         class Child extends Model {
-          protected _schema () {
-            let obj: any = {
+          _schema () {
+            let obj = {
               dataId: {
                 type: "integer",
                 value: null,
@@ -3380,7 +3380,7 @@ describe("Model test", function () {
 
         class Child extends Model {
 
-          protected _schema () {
+          _schema () {
             return {
               array: {
                 type: "array"
@@ -3433,11 +3433,11 @@ describe("Model test", function () {
         });
 
         /* Check stuff can be set */
-        (<any>obj).integer =  "12345";
-        expect((<any>obj).integer).to.be.equal(12345);
+        obj.integer =  "12345";
+        expect(obj.integer).to.be.equal(12345);
 
-        (<any>obj).boolean = 0;
-        expect((<any>obj).boolean).to.be.false;
+        obj.boolean = 0;
+        expect(obj.boolean).to.be.false;
 
       });
 
@@ -3445,7 +3445,7 @@ describe("Model test", function () {
 
         class Child extends Model {
 
-          protected _schema () {
+          _schema () {
             return {
               array: {
                 type: "array"
@@ -3498,7 +3498,7 @@ describe("Model test", function () {
 
         class Child extends Model {
 
-          protected _schema () {
+          _schema () {
             return {
               array: {
                 type: "array"
@@ -3548,7 +3548,7 @@ describe("Model test", function () {
 
         class User extends Model {
 
-          protected _schema () {
+          _schema () {
             return {
               userId: {
                 type: "string",
@@ -3568,7 +3568,7 @@ describe("Model test", function () {
 
         class Users extends Collection {
 
-          protected _model () {
+          _model () {
             return User;
           }
 
@@ -3576,7 +3576,7 @@ describe("Model test", function () {
 
         class Child extends Model {
 
-          protected _schema() {
+          _schema() {
             return {
               users: {
                 type: Users

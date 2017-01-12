@@ -8,9 +8,7 @@
 
 /* Files */
 import {expect} from "../../helpers/configure";
-import {
-  scalarValues
-} from "../../../helpers/scalarValues";
+import scalarValues from "../../../src/helpers/scalarValues";
 
 describe("#scalarValues", function () {
 

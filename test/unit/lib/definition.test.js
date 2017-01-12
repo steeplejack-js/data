@@ -11,19 +11,19 @@ import {expect, proxyquire, sinon} from "../../helpers/configure";
 
 describe("Model Definition", function () {
 
-  let Definition: any,
-    Validation: any;
+  let Definition,
+    Validation;
   beforeEach(function () {
 
     Validation = {
       generateFunction: sinon.stub()
     };
 
-    Definition = proxyquire("../../lib/definition", {
+    Definition = proxyquire("../../src/lib/definition", {
       "./validation": {
         Validation: Validation
       }
-    }).Definition;
+    });
 
   });
 
@@ -116,7 +116,7 @@ describe("Model Definition", function () {
 
         Validation.generateFunction.returns("fn");
 
-        let value: any = {
+        let value = {
           my: "value"
         };
 
@@ -178,7 +178,7 @@ describe("Model Definition", function () {
 
     describe("#addValidation", function () {
 
-      let obj: any;
+      let obj;
       beforeEach(function () {
         obj = new Definition();
       });
@@ -261,13 +261,13 @@ describe("Model Definition", function () {
 
       it("should return true when set", function () {
 
-        let obj: any = new Definition({
+        let obj = new Definition({
           primaryKey: true
         });
 
         expect(obj.hasPrimaryKey()).to.be.true;
 
-        let obj1: any = new Definition({
+        let obj1 = new Definition({
           primaryKey: 1
         });
 
@@ -277,17 +277,17 @@ describe("Model Definition", function () {
 
       it("should return false when not set", function () {
 
-        let obj: any = new Definition();
+        let obj = new Definition();
 
         expect(obj.hasPrimaryKey()).to.be.false;
 
-        let obj1: any = new Definition({
+        let obj1 = new Definition({
           primaryKey: false
         });
 
         expect(obj1.hasPrimaryKey()).to.be.false;
 
-        let obj2: any = new Definition({
+        let obj2 = new Definition({
           primaryKey: 0
         });
 

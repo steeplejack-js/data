@@ -8,9 +8,7 @@
 
 /* Files */
 import {expect} from "../../helpers/configure";
-import {
-  getFnName
-} from "../../../helpers/getFnName";
+import getFnName from "../../../src/helpers/getFnName";
 
 describe("#getFnName", function () {
 

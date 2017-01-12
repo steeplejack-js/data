@@ -8,8 +8,8 @@
 
 /* Files */
 import {expect, sinon} from "../../helpers/configure";
-import {Model} from "../../../lib/model";
-import {Validation} from "../../../lib/validation";
+import Model from "../../../src/lib/model";
+import Validation from "../../../src/lib/validation";
 
 describe("Model validation test", function () {
 
@@ -20,7 +20,7 @@ describe("Model validation test", function () {
       it("should return true when it's not required and is the default value", function () {
 
         class Child extends Model {
-          protected _schema () {
+          _schema () {
             return {
               name: {
                 type: "string"
@@ -29,7 +29,7 @@ describe("Model validation test", function () {
           }
         }
 
-        let fn: Function = Validation.createClosure(function () {}, null, null, false);
+        let fn = Validation.createClosure(function () {}, null, null, false);
 
         let obj = new Child();
 
@@ -40,7 +40,7 @@ describe("Model validation test", function () {
       it("should return a function with default arguments set", function () {
 
         class Child extends Model {
-          protected _schema () {
+          _schema () {
             return {
               name: {
                 type: "string"
@@ -53,7 +53,7 @@ describe("Model validation test", function () {
           name: "set value"
         });
 
-        let validationFn = function (...args: any[]) {
+        let validationFn = function (...args) {
 
           expect(args).to.have.length(2);
 
@@ -64,7 +64,7 @@ describe("Model validation test", function () {
 
         };
 
-        let fn: Function = Validation.createClosure(validationFn, null, null, false);
+        let fn = Validation.createClosure(validationFn, null, null, false);
 
         expect(fn("desired value", obj)).to.be.equal("result");
 
@@ -73,7 +73,7 @@ describe("Model validation test", function () {
       it("should run with some params", function () {
 
         class Child extends Model {
-          protected _schema () {
+          _schema () {
             return {
               name: {
                 type: "string"
@@ -86,11 +86,11 @@ describe("Model validation test", function () {
           name: "set value"
         });
 
-        let params: any[] = [
+        let params = [
           1, 2, 3
         ];
 
-        let validationFn = function (...args: any[]) {
+        let validationFn = function (...args) {
 
           expect(args).to.have.length(5);
 
@@ -104,7 +104,7 @@ describe("Model validation test", function () {
 
         };
 
-        let fn: Function = Validation.createClosure(validationFn, params, null, false);
+        let fn = Validation.createClosure(validationFn, params, null, false);
 
         expect(fn("myValue", obj)).to.be.equal("result");
 
@@ -116,7 +116,7 @@ describe("Model validation test", function () {
 
       describe("stubbed createClosure", function () {
 
-        let stub:any;
+        let stub;
         beforeEach(function () {
           stub = sinon.stub(Validation, "createClosure");
         });
@@ -141,7 +141,7 @@ describe("Model validation test", function () {
             return true;
           };
           let param = ["param1", "param2"];
-          let defaultValue:any = null;
+          let defaultValue = null;
 
           stub.returns(closure);
 
@@ -162,7 +162,7 @@ describe("Model validation test", function () {
           let closure = function () {
           };
           let param = ["param1", "param2"];
-          let defaultValue:any = null;
+          let defaultValue = null;
 
           stub.returns(closure);
 
@@ -207,8 +207,8 @@ describe("Model validation test", function () {
         it("should use the datautils.validation method if a string rule given", function () {
 
           let rule = "email";
-          let param:any[] = null;
-          let defaultValue:any = null;
+          let param = null;
+          let defaultValue = null;
 
           let fn = Validation.generateFunction({
             rule,
@@ -218,7 +218,7 @@ describe("Model validation test", function () {
           expect(fn).to.be.a("function");
 
           class Child extends Model {
-            protected _schema () {
+            _schema () {
               return {
                 email: {
                   type: "string"
@@ -244,7 +244,7 @@ describe("Model validation test", function () {
       it("should return true when value matches the model value", function () {
 
         class Child extends Model {
-          protected _schema () {
+          _schema () {
             return {
               id: {
                 type: "string"
@@ -264,7 +264,7 @@ describe("Model validation test", function () {
       it("should throw an error when the values don't match", function () {
 
         class Child extends Model {
-          protected _schema () {
+          _schema () {
             return {
               hello: {
                 type: "string"
