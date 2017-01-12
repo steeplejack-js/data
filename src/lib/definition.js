@@ -24,7 +24,7 @@ module.exports = class Definition {
    * @param {*} data
    * @returns {Definition}
    */
-  public static toDefinition (name, data) {
+  static toDefinition (name, data) {
 
     return new Definition({
       column: data.column === null ? null : data.column || name,
@@ -38,7 +38,7 @@ module.exports = class Definition {
 
   }
 
-  public constructor (data = null) {
+  constructor (data = null) {
 
     let options = _.isObject(data) ? data : {};
 
@@ -71,7 +71,7 @@ module.exports = class Definition {
    * @param {Array|object} rule
    * @returns {Definition}
    */
-  public addValidation (rule = null) {
+  addValidation (rule = null) {
 
     if (_.isArray(rule)) {
 
@@ -97,7 +97,7 @@ module.exports = class Definition {
    * @param {string} setting
    * @returns {*}
    */
-  public getSetting (setting) {
+  getSetting (setting) {
     return this.settings[setting];
   }
 
@@ -108,7 +108,7 @@ module.exports = class Definition {
    *
    * @returns {boolean}
    */
-  public hasPrimaryKey () {
+  hasPrimaryKey () {
     return this.primaryKey;
   }
 
