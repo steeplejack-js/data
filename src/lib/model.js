@@ -418,21 +418,6 @@ export default class Model extends Base {
   }
 
   /**
-   * Schema
-   *
-   * This must return a schema object which
-   * defines how our model looks and behaves. If
-   * you wish to extend a model to create another
-   * model, then merge your parent schema with
-   * this schema using the _mergeSchemas method.
-   *
-   * @private
-   */
-  _schema () {
-    throw new SyntaxError('_schema method must be defined on a model instance');
-  }
-
-  /**
    * Configure Definition
    *
    * Takes the schema and converts it to a
