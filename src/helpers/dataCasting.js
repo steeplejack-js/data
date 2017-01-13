@@ -22,11 +22,11 @@
 /* Files */
 
 export default {
-  array: "setArray",
-  boolean: "setBool",
-  date: "setDate",
-  float: "setFloat",
-  integer: "setInt",
-  object: "setObject",
-  string: "setString",
+  array: 'setArray',
+  boolean: 'setBool',
+  date: 'setDate',
+  float: 'setFloat',
+  integer: 'setInt',
+  object: 'setObject',
+  string: 'setString',
 };

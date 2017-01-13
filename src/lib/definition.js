@@ -7,8 +7,8 @@
 /* Node modules */
 
 /* Third-party modules */
-import { Base } from "@steeplejack/core";
-import { _ } from "lodash";
+import { Base } from '@steeplejack/core';
+import { _ } from 'lodash';
 
 /* Files */
 import Validation from './validation';
@@ -25,7 +25,6 @@ export default class Definition {
    * @returns {Definition}
    */
   static toDefinition (name, data) {
-
     return new Definition({
       column: data.column === null ? null : data.column || name,
       enum: data.enum,
@@ -35,12 +34,10 @@ export default class Definition {
       validation: data.validation,
       value: data.value,
     });
-
   }
 
   constructor (data = null) {
-
-    let options = _.isObject(data) ? data : {};
+    const options = _.isObject(data) ? data : {};
 
     let type = null;
     if (_.isString(options.type) || _.isFunction(options.type)) {
@@ -59,7 +56,6 @@ export default class Definition {
     if (options.validation) {
       this.addValidation(options.validation);
     }
-
   }
 
   /**
@@ -72,21 +68,15 @@ export default class Definition {
    * @returns {Definition}
    */
   addValidation (rule = null) {
-
     if (_.isArray(rule)) {
-
-      _.each(rule, item => {
-
-        let validateFn = Validation.generateFunction(item, this.value);
+      _.each(rule, (item) => {
+        const validateFn = Validation.generateFunction(item, this.value);
 
         this.validation.push(validateFn);
-
       });
-
     }
 
     return this;
-
   }
 
   /**
@@ -112,4 +102,4 @@ export default class Definition {
     return this.primaryKey;
   }
 
-};
+}

@@ -7,7 +7,7 @@
 /* Node modules */
 
 /* Third-party modules */
-import { _ } from "lodash";
+import { _ } from 'lodash';
 
 /* Files */
 
@@ -20,8 +20,7 @@ import { _ } from "lodash";
  * @param {*} value
  * @returns {*}
  */
-export default value => {
-
+export default (value) => {
   if (_.isObject(value)) {
     /* Set objects to strings */
     if (_.isDate(value)) {
@@ -32,5 +31,4 @@ export default value => {
   }
 
   return value;
-
 };

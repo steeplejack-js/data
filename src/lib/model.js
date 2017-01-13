@@ -10,14 +10,14 @@
 /* Node modules */
 
 /* Third-party modules */
-import {Base, ValidationException} from "@steeplejack/core";
-import { _ } from "lodash";
+import { Base, ValidationException } from '@steeplejack/core';
+import { _ } from 'lodash';
 
 /* Files */
-import dataCasting from "../helpers/dataCasting";
-import getFnName from "../helpers/getFnName";
-import scalarValues from "../helpers/scalarValues";
-import Definition from "./definition";
+import dataCasting from '../helpers/dataCasting';
+import getFnName from '../helpers/getFnName';
+import scalarValues from '../helpers/scalarValues';
+import Definition from './definition';
 
 export default class Model extends Base {
 
@@ -45,27 +45,24 @@ export default class Model extends Base {
    * data in the same format that is returned
    * from the toDb() method
    *
-   * @param {any} data
+   * @param {*} data
    * @returns {Model}
    */
   static toModel (data = {}) {
-
     /* Create a new instance of this model with default data */
     const model = Object.create(this.prototype);
     this.apply(model, []);
 
-    let definition = model.getColumnKeys();
+    const definition = model.getColumnKeys();
 
     /* Set the column data to the model */
     _.each(definition, (item) => {
-
       const key = item.key;
       let value = data[item.column];
       const modelDefinition = model.getDefinition(key);
       const type = modelDefinition.type;
 
-      if (value !== modelDefinition.value && value !== void 0) {
-
+      if (value !== modelDefinition.value && value !== undefined) {
         if (_.isFunction(type.toModels)) {
           /* It's a collection */
           value = type.toModels(value).getData();
@@ -73,16 +70,13 @@ export default class Model extends Base {
           /* It's a model */
           value = type.toModel(value).getData();
         }
-
       }
 
       /* Set the data to the model */
       model.set(key, value);
-
     });
 
     return model;
-
   }
 
 
@@ -92,7 +86,6 @@ export default class Model extends Base {
    * @param {object} data
    */
   constructor (data = {}) {
-
     /* istanbul ignore next */
     super();
 
@@ -115,7 +108,6 @@ export default class Model extends Base {
     _.each(data, (value, key) => {
       this[key] = value;
     });
-
   }
 
   /**
@@ -124,28 +116,21 @@ export default class Model extends Base {
    * Returns the data set to the key name
    *
    * @param {string} key
-   * @returns {any}
+   * @returns {*}
    */
   get (key) {
-
     /* Look for a method first */
-    let customFunc = getFnName("_get", key);
+    const customFunc = getFnName('_get', key);
 
     /* Get the current value */
-    let currentValue = (_.has(this.Data, key)) ? this.Data[key] : void 0;
+    const currentValue = (_.has(this.Data, key)) ? this.Data[key] : undefined;
 
     if (_.isFunction(this[customFunc])) {
-
       /* Use the custom function */
       return this[customFunc](currentValue);
-
-    } else {
-
-      /* Just return the value */
-      return currentValue;
-
     }
-
+    /* Just return the value */
+    return currentValue;
   }
 
   /**
@@ -157,18 +142,14 @@ export default class Model extends Base {
    * @returns {*[]}
    */
   getColumnKeys () {
-
     return _.reduce(this.Definition, (result, definition, key) => {
-
       result.push({
         column: definition.column,
         key,
       });
 
       return result;
-
     }, []);
-
   }
 
   /**
@@ -185,12 +166,10 @@ export default class Model extends Base {
    * it will just be the raw data.
    *
    * @param {boolean} parse
-   * @returns {any}
+   * @returns {*}
    */
   getData (parse = true) {
-
     return _.reduce(this.Data, (result, data, key) => {
-
       if (_.isObject(data) && _.isFunction(data.getData)) {
         data = data.getData();
       } else if (parse) {
@@ -200,9 +179,7 @@ export default class Model extends Base {
       result[key] = data;
 
       return result;
-
     }, {});
-
   }
 
   /**
@@ -265,48 +242,38 @@ export default class Model extends Base {
    * Otherwise, it uses simple datatype rules.
    *
    * @param {string} key
-   * @param {any} value
+   * @param {*} value
    * @returns {Model}
    */
-  set (key, value = void 0) {
-
-    let definition = this.getDefinition(key);
+  set (key, value = undefined) {
+    const definition = this.getDefinition(key);
 
     if (definition === null) {
       /* We don't know this key here */
       return this;
     }
 
-    let customFunc = getFnName("_set", key);
-    let defaultValue = definition.value;
+    const customFunc = getFnName('_set', key);
+    const defaultValue = definition.value;
 
     if (_.isFunction(this[customFunc])) {
-
       value = this._setCustomFunction(customFunc, value, defaultValue);
-
     } else {
-
-      let type = definition.type;
+      const type = definition.type;
 
       /* Is the type a class? */
       if (_.isFunction(type)) {
-
         /* Yup - is it already instance of the type? */
         value = this._setStandardFunction(type, value, defaultValue);
-
       } else {
-
         /* No - treat as string */
         value = this._setStringFunction(type, value, defaultValue, definition);
-
       }
-
     }
 
     this.Data[key] = value;
 
     return this;
-
   }
 
   /**
@@ -316,18 +283,15 @@ export default class Model extends Base {
    * representation object. This is an
    * object literal
    *
-   * @returns {any}
+   * @returns {*}
    */
   toDb () {
-
     return _.reduce(this.Definition, (result, definition, key) => {
-
       /* Get the column name */
       const column = definition.column;
 
       /* Ignore null columns */
       if (column !== null) {
-
         let data = this[key];
 
         /* If it's an instance of the model, get the DB representation */
@@ -336,11 +300,9 @@ export default class Model extends Base {
         }
 
         result[column] = data;
-
       }
 
       return result;
-
     }, {});
   }
 
@@ -355,58 +317,45 @@ export default class Model extends Base {
    * @returns {boolean}
    */
   validate () {
-
     /* Create a validation error - will put any errors here */
-    let validation = new ValidationException("Model validation error");
+    const validation = new ValidationException('Model validation error');
 
     /* Run through each of the definitions for the validation rules */
     _.each(this.Definition, (definition, key) => {
-
       /* Get the current value */
-      let value = this.get(key);
+      const value = this.get(key);
 
       if (_.isObject(value) && _.isFunction(value.validate)) {
-
         /* Collection or Model - validate that */
         try {
           value.validate();
         } catch (err) {
-
           _.each(err.getErrors(), (list, errKey) => {
-
             _.each(list, (error) => {
-
-              let name = [
+              const name = [
                 key,
                 errKey,
-              ].join("_");
+              ].join('_');
 
               validation.addError(name, error.value, error.message, error.additional);
-
             });
-
           });
-
         }
-
       }
 
       /* Cycle through the validation rules */
-      _.each(definition.validation, rule => {
-
+      _.each(definition.validation, (rule) => {
         try {
           /* A validation function can throw error or return false */
           if (rule(value, this) === false) {
             /* Returned false - throw a simple error */
-            throw new Error("Custom model validation failed");
+            throw new Error('Custom model validation failed');
           }
         } catch (err) {
           /* Add the validation error */
           validation.addError(key, value, err.message, err.params);
         }
-
       });
-
     });
 
     if (validation.hasErrors()) {
@@ -416,7 +365,6 @@ export default class Model extends Base {
 
     /* Return true to show we're happy */
     return true;
-
   }
 
   /**
@@ -432,10 +380,9 @@ export default class Model extends Base {
    * @returns {boolean}
    */
   where (properties) {
-
     /* Throw error if non-object */
     if (_.isPlainObject(properties) === false) {
-      throw new TypeError("Model.where properties must be an object");
+      throw new TypeError('Model.where properties must be an object');
     }
 
     /* If there are no properties set, always return false */
@@ -444,11 +391,10 @@ export default class Model extends Base {
     }
 
     /* Clone the model so we can use the setter without breaking the references */
-    let tmp = this.clone();
+    const tmp = this.clone();
 
     /* Create a target object - the values we want to check */
-    let target = _.reduce(properties, (result, value, key) => {
-
+    const target = _.reduce(properties, (result, value, key) => {
       /* Set the value to the model so in the right format */
       tmp.set(key, value);
 
@@ -457,22 +403,18 @@ export default class Model extends Base {
       result[key] = value;
 
       return result;
-
     }, {});
 
     /* Get the current values for each of the properties */
-    let current = _.reduce(properties, (result, value, key) => {
-
+    const current = _.reduce(properties, (result, value, key) => {
       value = scalarValues(this.get(key));
 
       result[key] = value;
 
       return result;
-
     }, {});
 
     return _.isEqual(current, target);
-
   }
 
   /**
@@ -486,8 +428,8 @@ export default class Model extends Base {
    *
    * @private
    */
-   _schema (child = {}) {
-     throw new SyntaxError('_schema method must be defined on a model instance');
+  _schema () {
+    throw new SyntaxError('_schema method must be defined on a model instance');
   }
 
   /**
@@ -499,11 +441,9 @@ export default class Model extends Base {
    * @private
    */
   _configureDefinition () {
-
     /* Written like this (not with _.reduce) as the setter needs to access the definition */
     _.each(this.getSchema(), (schemaItem, key) => {
-
-      let definition = Definition.toDefinition(key, schemaItem);
+      const definition = Definition.toDefinition(key, schemaItem);
 
       if (definition.hasPrimaryKey()) {
         this._setPrimaryKey(key);
@@ -521,10 +461,8 @@ export default class Model extends Base {
       });
 
       /* Set the default value */
-      this[key] = void 0;
-
+      this[key] = undefined;
     });
-
   }
 
   /**
@@ -572,11 +510,10 @@ export default class Model extends Base {
    * @private
    */
   _setPrimaryKey (key) {
-
     if (this.getPrimaryKey() === null) {
       this.PrimaryKey = key;
     } else {
-      throw new Error("CANNOT_SET_MULTIPLE_PRIMARY_KEYS");
+      throw new Error('CANNOT_SET_MULTIPLE_PRIMARY_KEYS');
     }
   }
 
@@ -586,16 +523,14 @@ export default class Model extends Base {
    * This is setting a standard function which actually
    * a function
    *
-   * @param {function} type
+   * @param {function} Type
    * @param {*} value
    * @param {*} defaultValue
    * @returns {*}
    * @private
    */
-  _setStandardFunction (type, value, defaultValue) {
-
-    if (value instanceof type === false) {
-
+  _setStandardFunction (Type, value, defaultValue) {
+    if (value instanceof Type === false) {
       /* No - populate the instance if something set */
       let createNew = false;
 
@@ -607,13 +542,11 @@ export default class Model extends Base {
       }
 
       if (createNew) {
-        value = new type(value);
+        value = new Type(value);
       }
-
     }
 
     return value;
-
   }
 
   /**
@@ -630,14 +563,13 @@ export default class Model extends Base {
    * @private
    */
   _setStringFunction (type, value, defaultValue, definition) {
-
     switch (type) {
 
-      case "enum":
+      case 'enum':
         value = Base.datatypes.setEnum(value, definition.enum, defaultValue);
         break;
 
-      case "mixed":
+      case 'mixed':
         if (_.isUndefined(value)) {
           value = defaultValue;
         }
@@ -645,12 +577,10 @@ export default class Model extends Base {
 
       default:
         if (_.has(dataCasting, type)) {
-
           const fnName = dataCasting[type];
           const fn = Base.datatypes[fnName];
 
           value = fn(value, defaultValue);
-
         } else {
           /* Unknown datatype */
           throw new TypeError(`Definition.type '${type}' is not valid`);
@@ -659,7 +589,6 @@ export default class Model extends Base {
     }
 
     return value;
-
   }
 
-};
+}

@@ -10,13 +10,12 @@
 /* Node modules */
 
 /* Third-party modules */
-import {Base, ValidationException} from "@steeplejack/core";
-import { _ } from "lodash";
-import uuid from "node-uuid";
+import { Base, ValidationException } from '@steeplejack/core';
+import { _ } from 'lodash';
+import uuid from 'node-uuid';
 
 /* Files */
-import sorting from "../helpers/sorting";
-import Model from "./model";
+import sorting from '../helpers/sorting';
 
 const { sortAsc, sortDesc } = sorting;
 
@@ -33,22 +32,20 @@ export default class Collection extends Base {
    * @param {Object[]} data
    * @returns {Collection}
    */
-  static toModels(data = null) {
-
+  static toModels (data = null) {
     /* Create a new instance of this collection with default data */
-    let collection = Object.create(this.prototype);
+    const collection = Object.create(this.prototype);
     this.apply(collection, []);
 
     _.each(data, (item) => {
       if (_.isObject(item) && _.isEmpty(item) === false) {
-        let model = collection.getModel().toModel(item);
+        const model = collection.getModel().toModel(item);
 
         collection.addOne(model);
       }
     });
 
     return collection;
-
   }
 
   /**
@@ -59,7 +56,6 @@ export default class Collection extends Base {
    * @param {Object[]} data
    */
   constructor (data = null) {
-
     /* istanbul ignore next */
     super();
 
@@ -69,7 +65,6 @@ export default class Collection extends Base {
 
     /* Add in anything passed in */
     this.add(data);
-
   }
 
   /**
@@ -81,7 +76,6 @@ export default class Collection extends Base {
    * @returns {Collection}
    */
   add (data = null) {
-
     /* Ensure we've got an array */
     if (_.isArray(data)) {
       _.each(data, (item) => {
@@ -90,7 +84,6 @@ export default class Collection extends Base {
     }
 
     return this;
-
   }
 
   /**
@@ -98,13 +91,11 @@ export default class Collection extends Base {
    *
    * Adds one object to the collection
    *
-   * @param {any} data
+   * @param {*} data
    * @returns {string}
    */
   addOne (data = null) {
-
     if (_.isObject(data) && _.isArray(data) === false) {
-
       let model;
       const ModelConstructor = this._model();
 
@@ -117,18 +108,16 @@ export default class Collection extends Base {
       }
 
       /* Add to the collection */
-      let id = uuid.v4();
+      const id = uuid.v4();
       this.Order.push(id);
       this.Data[id] = model;
 
-      this.emit("model_added", model, this.Order.length - 1, id);
+      this.emit('model_added', model, this.Order.length - 1, id);
 
       return id;
-
     }
 
     return null;
-
   }
 
   /**
@@ -142,19 +131,15 @@ export default class Collection extends Base {
    * @returns {Collection}
    */
   each (iterator, thisArg = null) {
-
     if (_.isFunction(iterator) === false) {
-      throw new TypeError("iterator must be a function");
+      throw new TypeError('iterator must be a function');
     }
 
-    let collection = this.getAll();
+    const collection = this.getAll();
 
-    _.each(collection, data => {
-      return iterator.call(thisArg, data.model, data.id, collection);
-    });
+    _.each(collection, data => iterator.call(thisArg, data.model, data.id, collection));
 
     return this;
-
   }
 
   /**
@@ -168,19 +153,15 @@ export default class Collection extends Base {
    * @returns {Collection}
    */
   eachRight (iterator, thisArg = null) {
-
     if (_.isFunction(iterator) === false) {
-      throw new TypeError("iterator must be a function");
+      throw new TypeError('iterator must be a function');
     }
 
-    let collection = this.getAll();
+    const collection = this.getAll();
 
-    _.eachRight(collection, data => {
-      return iterator.call(thisArg, data.model, data.id, collection);
-    });
+    _.eachRight(collection, data => iterator.call(thisArg, data.model, data.id, collection));
 
     return this;
-
   }
 
   /**
@@ -193,7 +174,6 @@ export default class Collection extends Base {
    * @returns {Collection}
    */
   filter (properties) {
-
     this.each((model, id) => {
       if (model.where(properties)) {
         /* Remove this from the collection */
@@ -202,7 +182,6 @@ export default class Collection extends Base {
     });
 
     return this;
-
   }
 
   /**
@@ -217,17 +196,15 @@ export default class Collection extends Base {
    * @returns {null}
    */
   find (properties) {
-
     let result = null;
 
-    this.each(model => {
+    this.each((model) => {
       if (result === null && model.where(properties)) {
         result = model;
       }
     });
 
     return result;
-
   }
 
   /**
@@ -241,17 +218,15 @@ export default class Collection extends Base {
    * @returns {Model}
    */
   findLast (properties) {
-
     let result = null;
 
-    this.eachRight(model => {
+    this.eachRight((model) => {
       if (result === null && model.where(properties)) {
         result = model;
       }
     });
 
     return result;
-
   }
 
   /**
@@ -262,12 +237,10 @@ export default class Collection extends Base {
    * @returns {[]}
    */
   getAll () {
-    return _.map(this.Order, id => {
-      return {
-        id,
-        model: this.Data[id],
-      };
-    });
+    return _.map(this.Order, id => ({
+      id,
+      model: this.Data[id],
+    }));
   }
 
   /**
@@ -280,20 +253,16 @@ export default class Collection extends Base {
    * @returns {Model[]}
    */
   getAllById (ids) {
-
     /* Get the keys for the models */
-    let keys = _.reduce(this.getAll(), (result, data, key) => {
-
+    const keys = _.reduce(this.getAll(), (result, data, key) => {
       if (_.indexOf(ids, data.id) !== -1) {
         result.push(key);
       }
 
       return result;
-
     }, []);
 
     return this.getAllByKey(keys);
-
   }
 
   /**
@@ -306,17 +275,13 @@ export default class Collection extends Base {
    * @returns {Model[]}
    */
   getAllByKey (id) {
-
     return _.reduce(this.getAll(), (result, data, key) => {
-
       if (_.indexOf(id, key) !== -1) {
         result.push(data.model);
       }
 
       return result;
-
     }, []);
-
   }
 
   /**
@@ -329,20 +294,16 @@ export default class Collection extends Base {
    * @returns {Model[]}
    */
   getAllByModel (models) {
-
     /* Get the IDs for the models */
-    let keys = _.reduce(this.getAll(), (result, data, key) => {
-
+    const keys = _.reduce(this.getAll(), (result, data, key) => {
       if (_.indexOf(models, data.model) !== -1) {
         result.push(key);
       }
 
       return result;
-
     }, []);
 
     return this.getAllByKey(keys);
-
   }
 
   /**
@@ -351,11 +312,10 @@ export default class Collection extends Base {
    * Search through the collection for the ID
    *
    * @param id
-   * @returns {any}
+   * @returns {*}
    */
   getById (id) {
-
-    let models = this.getAllById([
+    const models = this.getAllById([
       id,
     ]);
 
@@ -364,7 +324,6 @@ export default class Collection extends Base {
     }
 
     return null;
-
   }
 
   /**
@@ -377,8 +336,7 @@ export default class Collection extends Base {
    * @returns {Model}
    */
   getByKey (id) {
-
-    let models = this.getAllByKey([
+    const models = this.getAllByKey([
       id,
     ]);
 
@@ -387,7 +345,6 @@ export default class Collection extends Base {
     }
 
     return null;
-
   }
 
   /**
@@ -399,8 +356,7 @@ export default class Collection extends Base {
    * @returns {Model}
    */
   getByModel (model) {
-
-    let models = this.getAllByModel([
+    const models = this.getAllByModel([
       model,
     ]);
 
@@ -409,7 +365,6 @@ export default class Collection extends Base {
     }
 
     return null;
-
   }
 
   /**
@@ -431,10 +386,8 @@ export default class Collection extends Base {
    * @param {boolean} parse
    * @returns {any[]}
    */
-  getData (parse = void 0) {
-    return _.map(this.getAll(), item => {
-      return item.model.getData(parse);
-    });
+  getData (parse = undefined) {
+    return _.map(this.getAll(), item => item.model.getData(parse));
   }
 
   /**
@@ -445,9 +398,7 @@ export default class Collection extends Base {
    * @returns {string[]}
    */
   getIds () {
-    return _.map(this.getAll(), item => {
-      return item.id;
-    });
+    return _.map(this.getAll(), item => item.id);
   }
 
   /**
@@ -478,35 +429,31 @@ export default class Collection extends Base {
    * @returns {Collection}
    */
   limit (limit, offset = 0) {
-
     limit = Base.datatypes.setInt(limit, null);
 
     if (limit === null || limit < 0) {
-      throw new TypeError("Collection.limit must be a positive integer");
+      throw new TypeError('Collection.limit must be a positive integer');
     }
 
     if (limit === 0) {
       /* Get rid of everything */
       this.reset();
     } else if (limit < this.getCount()) {
-
       /* Get the keys in the data */
-      let keys = this.getIds();
+      const keys = this.getIds();
 
       /* Slice the keys */
-      let endKey = limit + offset;
+      const endKey = limit + offset;
 
       /* Work out which keys to remove */
-      let removeKeys = _.difference(keys, keys.slice(offset, endKey));
+      const removeKeys = _.difference(keys, keys.slice(offset, endKey));
 
-      _.each(removeKeys, key => {
+      _.each(removeKeys, (key) => {
         this.removeById(key);
       });
-
     }
 
     return this;
-
   }
 
   /**
@@ -518,7 +465,6 @@ export default class Collection extends Base {
    * @returns {boolean}
    */
   reset () {
-
     if (_.isEmpty(this.Data)) {
       /* Nothing to do - it's already empty */
       return false;
@@ -528,7 +474,6 @@ export default class Collection extends Base {
     this.Order = [];
 
     return _.isEmpty(this.Data);
-
   }
 
   /**
@@ -540,27 +485,21 @@ export default class Collection extends Base {
    * @returns {boolean}
    */
   removeById (id) {
-
     if (_.has(this.Data, id)) {
-
-      let model = this.getById(id);
-      let position = _.indexOf(this.Order, id);
+      const model = this.getById(id);
+      const position = _.indexOf(this.Order, id);
 
       /* Delete the data */
       delete this.Data[id];
 
-      _.remove(this.Order, (orderId) => {
-        return orderId === id;
-      });
+      _.remove(this.Order, orderId => orderId === id);
 
-      this.emit("model_removed", model, position, id);
+      this.emit('model_removed', model, position, id);
 
       return true;
-
     }
 
     return false;
-
   }
 
   /**
@@ -572,18 +511,15 @@ export default class Collection extends Base {
    * @returns {boolean}
    */
   removeByModel (removeModel) {
-
     let removed = false;
 
     _.each(this.Data, (model, id) => {
       if (removeModel === model) {
         removed = this.removeById(id);
       }
-
     });
 
     return removed;
-
   }
 
   /**
@@ -597,13 +533,12 @@ export default class Collection extends Base {
    * @returns {Collection}
    */
   sort (fn) {
-
     if (_.isFunction(fn) === false) {
-      throw new TypeError("Collection.sort must receive a function");
+      throw new TypeError('Collection.sort must receive a function');
     }
 
     /* Get the array with everything */
-    let sorted = this.getAll();
+    const sorted = this.getAll();
 
     /* Sort the array by the values */
     sorted.sort(fn);
@@ -616,7 +551,6 @@ export default class Collection extends Base {
     }, []);
 
     return this;
-
   }
 
   /**
@@ -632,32 +566,29 @@ export default class Collection extends Base {
    * @returns {Collection}
    */
   sortBy (properties) {
-
     if (_.isPlainObject(properties) === false) {
-      throw new TypeError("Collection.sortBy must receive an object of keys and directions");
+      throw new TypeError('Collection.sortBy must receive an object of keys and directions');
     }
 
     /* Build a search object */
     const search = _.reduce(properties, (result, order, key) => {
-
       /* Default to ascending */
-      result[key] = order.toUpperCase() === "DESC" ? sortDesc : sortAsc;
+      result[key] = order.toUpperCase() === 'DESC' ? sortDesc : sortAsc;
 
       return result;
-
     }, {});
 
     /* Dispatch to the sort method */
     return this.sort((a, b) => {
+      const keys = _.keys(search);
+      const keyLength = keys.length;
+      const forEnd = keyLength - 1;
 
-      let keys = _.keys(search);
-      let keyLength = keys.length;
-      let forEnd = keyLength - 1;
+      let sorted;
 
-      for (let integer = 0; integer < keyLength; integer++) {
-
+      for (let integer = 0; integer < keyLength; integer += 1) {
         /* Decide what we're searching by - go in search object order */
-        let key = keys[integer];
+        const key = keys[integer];
 
         /* Get the value from the model */
         let value1 = a.model.get(key);
@@ -674,13 +605,13 @@ export default class Collection extends Base {
           /* Equal and not final sort key - things to do */
           break;
         } else {
-          return search[key](value1, value2);
+          sorted = search[key](value1, value2);
+          break;
         }
-
       }
 
+      return sorted;
     });
-
   }
 
   /**
@@ -692,9 +623,7 @@ export default class Collection extends Base {
    * @returns {TResult[]}
    */
   toDb () {
-    return _.map(this.getAll(), item => {
-      return item.model.toDb();
-    });
+    return _.map(this.getAll(), item => item.model.toDb());
   }
 
   /**
@@ -705,27 +634,18 @@ export default class Collection extends Base {
    * @returns {boolean}
    */
   validate () {
-
-    const collectionErr = new ValidationException("Collection validation error");
+    const collectionErr = new ValidationException('Collection validation error');
 
     _.each(this.getAll(), (item, id) => {
-
       try {
         item.model.validate();
       } catch (err) {
-
         _.each(err.getErrors(), (list, key) => {
-
           _.each(list, (error) => {
-
             collectionErr.addError(`${id}_${key}`, error.value, error.message, error.additional);
-
           });
-
         });
-
       }
-
     });
 
     if (collectionErr.hasErrors()) {
@@ -733,7 +653,6 @@ export default class Collection extends Base {
     }
 
     return true;
-
   }
 
   /**
@@ -747,18 +666,14 @@ export default class Collection extends Base {
    * @returns {Collection}
    */
   where (properties) {
-
     this.each((model, id) => {
-
       if (model.where(properties) === false) {
         /* Remove from the collection */
         this.removeById(id);
       }
-
     });
 
     return this;
-
   }
 
-};
+}
