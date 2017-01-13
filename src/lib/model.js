@@ -94,13 +94,13 @@ export default class Model extends Base {
      this and use the get/set methods to access
      it.
     */
-    this.Data = {};
+    this._data = {};
 
     /* This is your definition objects that control how the model behaves */
-    this.Definition = {};
+    this._definition = {};
 
     /* Defines the primary key on the model. This is optional */
-    this.PrimaryKey = null;
+    this._primaryKey = null;
 
     this._configureDefinition();
 
@@ -123,7 +123,7 @@ export default class Model extends Base {
     const customFunc = getFnName('_get', key);
 
     /* Get the current value */
-    const currentValue = (_.has(this.Data, key)) ? this.Data[key] : undefined;
+    const currentValue = (_.has(this._data, key)) ? this._data[key] : undefined;
 
     if (_.isFunction(this[customFunc])) {
       /* Use the custom function */
@@ -142,7 +142,7 @@ export default class Model extends Base {
    * @returns {*[]}
    */
   getColumnKeys () {
-    return _.reduce(this.Definition, (result, definition, key) => {
+    return _.reduce(this._definition, (result, definition, key) => {
       result.push({
         column: definition.column,
         key,
@@ -169,7 +169,7 @@ export default class Model extends Base {
    * @returns {*}
    */
   getData (parse = true) {
-    return _.reduce(this.Data, (result, data, key) => {
+    return _.reduce(this._data, (result, data, key) => {
       if (_.isObject(data) && _.isFunction(data.getData)) {
         data = data.getData();
       } else if (parse) {
@@ -193,7 +193,7 @@ export default class Model extends Base {
    * @returns {Definition|null}
    */
   getDefinition (key) {
-    return this.Definition[key] || null;
+    return this._definition[key] || null;
   }
 
   /**
@@ -204,7 +204,7 @@ export default class Model extends Base {
    * @return {string}
    */
   getPrimaryKey () {
-    return this.PrimaryKey;
+    return this._primaryKey;
   }
 
   /**
@@ -271,7 +271,7 @@ export default class Model extends Base {
       }
     }
 
-    this.Data[key] = value;
+    this._data[key] = value;
 
     return this;
   }
@@ -286,7 +286,7 @@ export default class Model extends Base {
    * @returns {*}
    */
   toDb () {
-    return _.reduce(this.Definition, (result, definition, key) => {
+    return _.reduce(this._definition, (result, definition, key) => {
       /* Get the column name */
       const column = definition.column;
 
@@ -321,7 +321,7 @@ export default class Model extends Base {
     const validation = new ValidationException('Model validation error');
 
     /* Run through each of the definitions for the validation rules */
-    _.each(this.Definition, (definition, key) => {
+    _.each(this._definition, (definition, key) => {
       /* Get the current value */
       const value = this.get(key);
 
@@ -450,7 +450,7 @@ export default class Model extends Base {
       }
 
       /* Set the definition to the class */
-      this.Definition[key] = definition;
+      this._definition[key] = definition;
 
       /* Create the setters and getters */
       Object.defineProperty(this, key, {
@@ -511,7 +511,7 @@ export default class Model extends Base {
    */
   _setPrimaryKey (key) {
     if (this.getPrimaryKey() === null) {
-      this.PrimaryKey = key;
+      this._primaryKey = key;
     } else {
       throw new Error('CANNOT_SET_MULTIPLE_PRIMARY_KEYS');
     }

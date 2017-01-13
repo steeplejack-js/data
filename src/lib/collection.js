@@ -59,9 +59,9 @@ export default class Collection extends Base {
     /* istanbul ignore next */
     super();
 
-    this.Data = {};
+    this._data = {};
 
-    this.Order = [];
+    this._order = [];
 
     /* Add in anything passed in */
     this.add(data);
@@ -109,10 +109,10 @@ export default class Collection extends Base {
 
       /* Add to the collection */
       const id = uuid.v4();
-      this.Order.push(id);
-      this.Data[id] = model;
+      this._order.push(id);
+      this._data[id] = model;
 
-      this.emit('model_added', model, this.Order.length - 1, id);
+      this.emit('model_added', model, this._order.length - 1, id);
 
       return id;
     }
@@ -237,9 +237,9 @@ export default class Collection extends Base {
    * @returns {[]}
    */
   getAll () {
-    return _.map(this.Order, id => ({
+    return _.map(this._order, id => ({
       id,
-      model: this.Data[id],
+      model: this._data[id],
     }));
   }
 
@@ -465,15 +465,15 @@ export default class Collection extends Base {
    * @returns {boolean}
    */
   reset () {
-    if (_.isEmpty(this.Data)) {
+    if (_.isEmpty(this._data)) {
       /* Nothing to do - it's already empty */
       return false;
     }
 
-    this.Data = {};
-    this.Order = [];
+    this._data = {};
+    this._order = [];
 
-    return _.isEmpty(this.Data);
+    return _.isEmpty(this._data);
   }
 
   /**
@@ -485,14 +485,14 @@ export default class Collection extends Base {
    * @returns {boolean}
    */
   removeById (id) {
-    if (_.has(this.Data, id)) {
+    if (_.has(this._data, id)) {
       const model = this.getById(id);
-      const position = _.indexOf(this.Order, id);
+      const position = _.indexOf(this._order, id);
 
       /* Delete the data */
-      delete this.Data[id];
+      delete this._data[id];
 
-      _.remove(this.Order, orderId => orderId === id);
+      _.remove(this._order, orderId => orderId === id);
 
       this.emit('model_removed', model, position, id);
 
@@ -513,7 +513,7 @@ export default class Collection extends Base {
   removeByModel (removeModel) {
     let removed = false;
 
-    _.each(this.Data, (model, id) => {
+    _.each(this._data, (model, id) => {
       if (removeModel === model) {
         removed = this.removeById(id);
       }
@@ -544,7 +544,7 @@ export default class Collection extends Base {
     sorted.sort(fn);
 
     /* Change the order array */
-    this.Order = _.reduce(sorted, (result, data) => {
+    this._order = _.reduce(sorted, (result, data) => {
       result.push(data.id);
 
       return result;
