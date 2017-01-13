@@ -10,7 +10,7 @@
 import Collection from "./lib/collection";
 import Model from "./lib/model";
 
-module.exports = {
+export default {
   Collection,
   Model,
 };

@@ -48,7 +48,7 @@ const sortDesc = (a, b) => {
   }
 };
 
-module.exports = {
+export default {
   sortAsc,
   sortDesc
 };

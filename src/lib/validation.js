@@ -12,7 +12,7 @@ import {_} from "lodash";
 /* Files */
 import Model from "./model";
 
-export class Validation {
+export default class Validation {
 
   /**
    * Create Closure

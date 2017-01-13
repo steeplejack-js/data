@@ -11,7 +11,6 @@ import {Base, ValidationException} from "@steeplejack/core";
 
 /* Files */
 import {expect, sinon} from "../../helpers/configure";
-import Definition from "../../../src/lib/definition";
 import Model from "../../../src/lib/model";
 import Collection from "../../../src/lib/collection";
 

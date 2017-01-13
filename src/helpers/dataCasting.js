@@ -21,7 +21,7 @@
 
 /* Files */
 
-module.exports = {
+export default {
   array: "setArray",
   boolean: "setBool",
   date: "setDate",

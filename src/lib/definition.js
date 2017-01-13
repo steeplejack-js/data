@@ -11,9 +11,9 @@ import { Base } from "@steeplejack/core";
 import { _ } from "lodash";
 
 /* Files */
-import {Validation} from "./validation";
+import Validation from './validation';
 
-module.exports = class Definition {
+export default class Definition {
 
   /**
    * To Definition

@@ -19,7 +19,7 @@ import getFnName from "../helpers/getFnName";
 import scalarValues from "../helpers/scalarValues";
 import Definition from "./definition";
 
-module.exports = class Model extends Base {
+export default class Model extends Base {
 
   /**
    * Merge

@@ -22,7 +22,7 @@ import { _ } from "lodash";
  * @param {string} keyName
  * @returns {string}
  */
-module.exports = (prefix, keyName) => {
+export default (prefix, keyName) => {
   keyName = _.capitalize(keyName);
   return prefix + keyName;
 };

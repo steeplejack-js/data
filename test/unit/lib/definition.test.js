@@ -20,10 +20,8 @@ describe("Model Definition", function () {
     };
 
     Definition = proxyquire("../../src/lib/definition", {
-      "./validation": {
-        Validation: Validation
-      }
-    });
+      "./validation": Validation
+    }).default;
 
   });
 

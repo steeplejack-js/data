@@ -15,10 +15,12 @@ import { _ } from "lodash";
 import uuid from "node-uuid";
 
 /* Files */
-import {sortAsc, sortDesc} from "../helpers/sorting";
+import sorting from "../helpers/sorting";
 import Model from "./model";
 
-module.exports = class Collection extends Base {
+const { sortAsc, sortDesc } = sorting;
+
+export default class Collection extends Base {
 
   /**
    * To Models

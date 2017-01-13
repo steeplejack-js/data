@@ -20,7 +20,7 @@ import { _ } from "lodash";
  * @param {*} value
  * @returns {*}
  */
-module.exports = value => {
+export default value => {
 
   if (_.isObject(value)) {
     /* Set objects to strings */
