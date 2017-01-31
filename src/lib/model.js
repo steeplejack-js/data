@@ -50,8 +50,7 @@ export default class Model extends Base {
    */
   static toModel (data = {}) {
     /* Create a new instance of this model with default data */
-    const model = Object.create(this.prototype);
-    this.apply(model, []);
+    const model = new this();
 
     const definition = model.getColumnKeys();
 
