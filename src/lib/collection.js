@@ -34,8 +34,7 @@ export default class Collection extends Base {
    */
   static toModels (data = null) {
     /* Create a new instance of this collection with default data */
-    const collection = Object.create(this.prototype);
-    this.apply(collection, []);
+    const collection = new this();
 
     _.each(data, (item) => {
       if (_.isObject(item) && _.isEmpty(item) === false) {
