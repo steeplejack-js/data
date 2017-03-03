@@ -12,7 +12,7 @@
 /* Third-party modules */
 import { Base, ValidationException } from '@steeplejack/core';
 import { _ } from 'lodash';
-import uuid from 'node-uuid';
+import uuid from 'uuid';
 
 /* Files */
 import sorting from '../helpers/sorting';
